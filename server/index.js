@@ -6,6 +6,8 @@ const dotenv = require("dotenv");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const UserModel = require("./Model/User");
+const TouristSpotModel = require("./Model/TouristSpot");
+
 
 dotenv.config();
 const app = express();
@@ -66,3 +68,20 @@ app.listen(process.env.PORT, () => {
             res.status(500).json({ error: error.message });
         }
     });
+
+    TouristSpotModel.init()
+    .then(() => console.log("Mongoose model synced with database"))
+    .catch(err => console.error("Error syncing model:", err));
+
+    app.get("/getspots", async (req, res) => {
+        try {
+          console.log("Fetching tourist spots...");
+          const touristSpots = await TouristSpotModel.find();
+          console.log("Tourist spots retrieved:", touristSpots); // Log fetched data
+          res.status(200).json(touristSpots);
+        } catch (err) {
+          console.error("Error fetching spots:", err);
+          res.status(500).json({ error: err.message });
+        }
+      });
+      
