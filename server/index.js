@@ -7,6 +7,12 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const UserModel = require("./Model/User");
 const TouristSpotModel = require("./Model/TouristSpot");
+const multer = require("multer");
+const path = require("path");
+const axios = require("axios");
+
+const jwt = require("jsonwebtoken");
+const router = express.Router();
 
 
 dotenv.config();
@@ -14,6 +20,7 @@ const app = express();
 app.use(express.json());
 
  app.use(cors())
+ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
@@ -27,6 +34,19 @@ mongoose.connect(process.env.MONGO_URI)
 app.listen(process.env.PORT, () => {
         console.log(`Server is running on port ${process.env.PORT}`);
     });
+
+
+    // Set up storage for multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/"); // Store images in 'uploads' folder
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to the file name
+    }
+});
+
+const upload = multer({ storage });
 
 
    
@@ -57,7 +77,7 @@ app.listen(process.env.PORT, () => {
                 const passwordMatch = await bcrypt.compare(password, user.password);
                 if (passwordMatch) {
                     
-                    res.json("Success");
+                    res.json({ message: "Success", user });
                 } else {
                     res.status(401).json("Password doesn't match");
                 }
@@ -68,6 +88,75 @@ app.listen(process.env.PORT, () => {
             res.status(500).json({ error: error.message });
         }
     });
+
+
+
+    app.get("/user/:userId", async (req, res) => {
+        try {
+            const user = await UserModel.findById(req.params.userId); // Find the user by ID
+            if (user) {
+                res.json(user); // Return the user data
+            } else {
+                res.status(404).json("User not found");
+            }
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+
+    app.get("/api/places", async (req, res) => {
+        const { location, radius, type } = req.query;
+      
+        const apiKey = "AIzaSyBKA2-Q6ygjD_TfZdNL8g8PpPTWjhdgFzo"; // Replace with your actual API key
+        const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=${radius}&type=${type}&key=${apiKey}`;
+      
+        try {
+          const response = await axios.get(url);
+          res.json(response.data); // Forward the response data to the client
+        } catch (error) {
+          console.error("Error fetching Places API data:", error.message);
+          res.status(500).json({ error: "Failed to fetch data from Places API" });
+        }
+      });
+
+
+    app.put("/user/update/:userId", upload.single("image"), async (req, res) => {
+        try {
+            const { name, phonenum, address } = req.body;
+            const image = req.file ? req.file.filename : null; // Get the uploaded image filename
+    
+            // Find the user and update their details
+            const updatedUser = await UserModel.findByIdAndUpdate(
+                req.params.userId,
+                { name, phonenum, address, image },
+                { new: true }
+            );
+    
+            if (updatedUser) {
+                res.json(updatedUser); // Return updated user data with the image URL
+            } else {
+                res.status(404).json("User not found");
+            }
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+    
+    
+
+
+
+
+    
+    
+    
+    
+
+  
+
+
+   
 
     TouristSpotModel.init()
     .then(() => console.log("Mongoose model synced with database"))

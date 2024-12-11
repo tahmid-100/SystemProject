@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Grid, Link, Button, Paper, TextField, Typography } from "@mui/material";
+import { Grid, Button, Paper, TextField, Typography } from "@mui/material";
 
 const paperStyle = { padding: '20px', height: '50vh', width: 400, margin: '20px auto' };
 const heading = { margin: '20px 0' };
@@ -18,11 +18,21 @@ export const Login = () => {
     // Handle form submission
     const handleLogin = (e) => {
         e.preventDefault();
-        axios.post("http://localhost:3001/login", { email, password } )
+        axios.post("http://localhost:3001/login", { email, password })
             .then(result => {
-                if (result.data === "Success") {
-                    navigate("/home")
-                       
+               
+                if (result.data.message === "Success") {
+
+                    const user = result.data.user;
+                    
+                    // Store the user's _id in localStorage or state
+                    localStorage.setItem("authToken", "user-token-example");
+
+                    localStorage.setItem("userId", user._id);
+                    console.log(user._id);
+        
+
+                    navigate("/home");
                 } else {
                     alert("Login failed");
                 }
@@ -32,23 +42,11 @@ export const Login = () => {
 
     return (
         <Grid align="center" className="wrapper">
-            <Paper style={paperStyle} sx={{
-                width: {
-                    xs: '80vw', // 0
-                    sm: '50vw', // 600
-                    md: '40vw', // 900
-                    lg: '30vw', // 1200
-                    xl: '20vw', // 1536
-                },
-                height: {
-                    lg: '60vh', // 1200px and up
-                }
-            }}>
-                <Typography component="h1" variant="h5" style={heading}> Login </Typography>  {/* Update heading */}
+            <Paper style={paperStyle}>
+                <Typography component="h1" variant="h5" style={heading}>Login</Typography>
                 <form onSubmit={handleLogin}>
                     <TextField
                         style={row}
-                        sx={{ label: { fontWeight: '700', fontSize: "1.3rem" } }}
                         fullWidth
                         label="Email"
                         variant="outlined"
@@ -56,11 +54,9 @@ export const Login = () => {
                         placeholder="Enter Email"
                         name="email"
                         onChange={(e) => setEmail(e.target.value)}
-                       
                     />
                     <TextField
                         style={row}
-                        sx={{ label: { fontWeight: '700', fontSize: "1.3rem" } }}
                         fullWidth
                         label="Password"
                         variant="outlined"
@@ -68,13 +64,9 @@ export const Login = () => {
                         placeholder="Enter Password"
                         name="password"
                         onChange={(e) => setPassword(e.target.value)}
-                         
                     />
-                    <Button style={btnStyle} variant="contained" type="submit">
-                        Login
-                    </Button>
+                    <Button style={btnStyle} variant="contained" type="submit">Login</Button>
                 </form>
-                
             </Paper>
         </Grid>
     );
