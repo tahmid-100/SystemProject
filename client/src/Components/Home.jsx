@@ -144,7 +144,7 @@ export const Home = () => {
             </button>
           </div>
           <div style={{ height: "400px", width: "100%" }}>
-            <LoadScript googleMapsApiKey="AIzaSyC8QbZZt7NftyzP7L77BVJQI6EFsbOxEPA">
+            <LoadScript googleMapsApiKey="AIzaSyARGxaUcbKuvSeR9ok_RLJiHedU0xrj2oQ">
               <GoogleMap
                 center={{
                   lat: parseFloat(selectedSpot.latitude),

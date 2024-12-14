@@ -108,7 +108,7 @@ const upload = multer({ storage });
     app.get("/api/places", async (req, res) => {
         const { location, radius, type } = req.query;
       
-        const apiKey = "AIzaSyBKA2-Q6ygjD_TfZdNL8g8PpPTWjhdgFzo"; // Replace with your actual API key
+        const apiKey = "AIzaSyARGxaUcbKuvSeR9ok_RLJiHedU0xrj2oQ"; // Replace with your actual API key
         const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=${radius}&type=${type}&key=${apiKey}`;
       
         try {
@@ -119,6 +119,14 @@ const upload = multer({ storage });
           res.status(500).json({ error: "Failed to fetch data from Places API" });
         }
       });
+
+
+       
+     
+
+
+
+
 
 
     app.put("/user/update/:userId", upload.single("image"), async (req, res) => {
