@@ -121,6 +121,50 @@ const upload = multer({ storage });
       });
 
 
+      app.get("/api/distance", async (req, res) => {
+
+        const { originLat, originLng, destLat, destLng } = req.query;
+
+        // Log received parameters
+        console.log("Received Parameters:", { originLat, originLng, destLat, destLng });
+      
+        // Validate parameters
+        if (!originLat || !originLng || !destLat || !destLng) {
+          return res.status(400).json({ error: "Missing or invalid parameters" });
+        }
+
+      
+        // Log received parameters for debugging
+        console.log("Received Parameters:", { originLat, originLng, destLat, destLng });
+      
+        // Validate parameters
+        if (!originLat || !originLng || !destLat || !destLng) {
+          return res.status(400).json({ error: "Missing or invalid parameters" });
+        }
+      
+        try {
+          const origin = `${originLat},${originLng}`;
+          const destination = `${destLat},${destLng}`;
+          const apiKey = "AIzaSyARGxaUcbKuvSeR9ok_RLJiHedU0xrj2oQ";
+      
+          const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&key=${apiKey}`;
+          const response = await axios.get(url);
+      
+          if (response.data.status === "OK") {
+            const distance = response.data.rows[0].elements[0].distance.text;
+            const duration = response.data.rows[0].elements[0].duration.text;
+            return res.json({ distance, duration });
+          } else {
+            console.error("Google API Error:", response.data.error_message || response.data);
+            return res.status(500).json({ error: "Failed to fetch distance from Google API" });
+          }
+        } catch (error) {
+          console.error("Error fetching distance:", error.message);
+          return res.status(500).send("Failed to fetch distance");
+        }
+      });
+      
+      
        
      
 

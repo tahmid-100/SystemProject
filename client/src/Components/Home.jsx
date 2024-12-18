@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { LoadScript, GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
+import { LoadScript, GoogleMap, Marker, InfoWindow, DirectionsRenderer } from "@react-google-maps/api";
 
 export const Home = () => {
   const [touristSpots, setSpots] = useState([]);
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [directions, setDirections] = useState(null);
+  const [travelDetails, setTravelDetails] = useState(null);
+
 
   useEffect(() => {
     axios
@@ -16,7 +19,7 @@ export const Home = () => {
   }, []);
 
   const fetchNearbyPlaces = (lat, lng, type) => {
-    const radius = 5000; // 5 km
+    const radius = 20000; // 20 km
     axios
       .get("http://localhost:3001/api/places", {
         params: {
@@ -26,7 +29,6 @@ export const Home = () => {
         },
       })
       .then((response) => {
-        console.log("Places API Response:", response.data); // Log the entire response
         const places = response.data.results.map((place) => ({
           id: place.place_id,
           name: place.name,
@@ -38,13 +40,50 @@ export const Home = () => {
       })
       .catch((error) => console.error("Error fetching places:", error));
   };
-  
 
   const handleImageClick = (spot) => {
-    console.log("Selected Spot:", spot);
     setSelectedSpot(spot);
     fetchNearbyPlaces(spot.latitude, spot.longitude, "hotel"); // Default to hotels
   };
+
+  const handleGetDirections = () => {
+    if (selectedSpot) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const { latitude, longitude } = position.coords;
+          const userLocation = { lat: latitude, lng: longitude };
+  
+          const directionsService = new window.google.maps.DirectionsService();
+          const request = {
+            origin: userLocation,
+            destination: {
+              lat: parseFloat(selectedSpot.latitude),
+              lng: parseFloat(selectedSpot.longitude),
+            },
+            travelMode: window.google.maps.TravelMode.DRIVING,
+          };
+  
+          directionsService.route(request, (result, status) => {
+            if (status === "OK") {
+              setDirections(result);
+              const leg = result.routes[0].legs[0]; // Extract first leg of the route
+              setTravelDetails({
+                distance: leg.distance.text,
+                duration: leg.duration.text,
+              });
+            } else {
+              console.error("Directions request failed due to " + status);
+            }
+          });
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    } else {
+      alert("Please select a tourist spot first.");
+    }
+  };
+  
 
   return (
     <div
@@ -142,6 +181,7 @@ export const Home = () => {
             >
               Show Resorts
             </button>
+            <button onClick={handleGetDirections}>Get Directions</button>
           </div>
           <div style={{ height: "400px", width: "100%" }}>
             <LoadScript googleMapsApiKey="AIzaSyARGxaUcbKuvSeR9ok_RLJiHedU0xrj2oQ">
@@ -161,11 +201,11 @@ export const Home = () => {
                 />
                 {nearbyPlaces.map((place) => (
                   <Marker
-                  key={place.id}
-                  position={{ lat: place.lat, lng: place.lng }}
-                  title={place.name}
-                  onClick={() => setSelectedPlace(place)}
-                />
+                    key={place.id}
+                    position={{ lat: place.lat, lng: place.lng }}
+                    title={place.name}
+                    onClick={() => setSelectedPlace(place)}
+                  />
                 ))}
                 {selectedPlace && (
                   <InfoWindow
@@ -178,9 +218,17 @@ export const Home = () => {
                     </div>
                   </InfoWindow>
                 )}
+                {directions && <DirectionsRenderer directions={directions} />}
               </GoogleMap>
             </LoadScript>
+            
           </div>
+          {travelDetails && (
+    <div style={{ marginTop: "10px" }}>
+      <p><strong>Distance:</strong> {travelDetails.distance}</p>
+      <p><strong>Estimated Time:</strong> {travelDetails.duration}</p>
+    </div>
+  )}
         </div>
       )}
     </div>
