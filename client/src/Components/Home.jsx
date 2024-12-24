@@ -4,19 +4,33 @@ import { LoadScript, GoogleMap, Marker, InfoWindow, DirectionsRenderer } from "@
 
 export const Home = () => {
   const [touristSpots, setSpots] = useState([]);
+  const [filteredSpots, setFilteredSpots] = useState([]); // To store filtered spots
+  const [searchQuery, setSearchQuery] = useState(""); // Search input
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [directions, setDirections] = useState(null);
   const [travelDetails, setTravelDetails] = useState(null);
 
-
   useEffect(() => {
     axios
       .get("http://localhost:3001/getspots")
-      .then((touristSpots) => setSpots(touristSpots.data))
+      .then((response) => {
+        setSpots(response.data);
+        setFilteredSpots(response.data); // Initialize with all spots
+      })
       .catch((err) => console.error(err));
   }, []);
+
+  // Handle search query changes
+  const handleSearchChange = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+    const filtered = touristSpots.filter((spot) =>
+      spot.name.toLowerCase().includes(query)
+    );
+    setFilteredSpots(filtered);
+  };
 
   const fetchNearbyPlaces = (lat, lng, type) => {
     const radius = 20000; // 20 km
@@ -52,7 +66,7 @@ export const Home = () => {
         navigator.geolocation.getCurrentPosition((position) => {
           const { latitude, longitude } = position.coords;
           const userLocation = { lat: latitude, lng: longitude };
-  
+
           const directionsService = new window.google.maps.DirectionsService();
           const request = {
             origin: userLocation,
@@ -62,7 +76,7 @@ export const Home = () => {
             },
             travelMode: window.google.maps.TravelMode.DRIVING,
           };
-  
+
           directionsService.route(request, (result, status) => {
             if (status === "OK") {
               setDirections(result);
@@ -83,7 +97,6 @@ export const Home = () => {
       alert("Please select a tourist spot first.");
     }
   };
-  
 
   return (
     <div
@@ -95,6 +108,24 @@ export const Home = () => {
       }}
     >
       <h1>Tourist Spots</h1>
+
+      {/* Search Bar */}
+      <div style={{ marginBottom: "20px", textAlign: "center" }}>
+        <input
+          type="text"
+          placeholder="Search by name..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          style={{
+            width: "50%",
+            padding: "10px",
+            fontSize: "16px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        />
+      </div>
+
       <div
         style={{
           display: "flex",
@@ -103,10 +134,10 @@ export const Home = () => {
           justifyContent: "center",
         }}
       >
-        {touristSpots.length === 0 ? (
-          <p>Loading tourist spots...</p>
+        {filteredSpots.length === 0 ? (
+          <p>No tourist spots found.</p>
         ) : (
-          touristSpots.map((spot) => (
+          filteredSpots.map((spot) => (
             <div
               key={spot._id}
               style={{
@@ -183,6 +214,14 @@ export const Home = () => {
             </button>
             <button onClick={handleGetDirections}>Get Directions</button>
           </div>
+           
+          {travelDetails && (
+            <div style={{ marginTop: "10px" }}>
+              <p><strong>Distance:</strong> {travelDetails.distance}</p>
+              <p><strong>Estimated Time:</strong> {travelDetails.duration}</p>
+            </div>
+          )}
+
           <div style={{ height: "400px", width: "100%" }}>
             <LoadScript googleMapsApiKey="AIzaSyARGxaUcbKuvSeR9ok_RLJiHedU0xrj2oQ">
               <GoogleMap
@@ -191,7 +230,7 @@ export const Home = () => {
                   lng: parseFloat(selectedSpot.longitude),
                 }}
                 zoom={12}
-                mapContainerStyle={{ width: "100%", height: "100%" }}
+                mapContainerStyle={{ width: "80%", height: "150%" }}
               >
                 <Marker
                   position={{
@@ -221,14 +260,8 @@ export const Home = () => {
                 {directions && <DirectionsRenderer directions={directions} />}
               </GoogleMap>
             </LoadScript>
-            
           </div>
-          {travelDetails && (
-    <div style={{ marginTop: "10px" }}>
-      <p><strong>Distance:</strong> {travelDetails.distance}</p>
-      <p><strong>Estimated Time:</strong> {travelDetails.duration}</p>
-    </div>
-  )}
+         
         </div>
       )}
     </div>
