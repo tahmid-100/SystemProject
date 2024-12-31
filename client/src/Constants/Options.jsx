@@ -25,7 +25,7 @@ export const SelectTravelsList=[
         title:'Family',
         desc:'A group of fun loving adv',
         icon:'🏘️',
-        people:'3 t0 5 people'
+        people:'3 to 5 people'
   
       },
 

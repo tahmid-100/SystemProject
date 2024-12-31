@@ -1,22 +1,60 @@
 import React, { useState, useEffect } from "react"; // Import useEffect here
-import { GoogleMap, LoadScript } from "@react-google-maps/api";
+import {  LoadScript } from "@react-google-maps/api";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { SelectBudgetOptions } from "../Constants/Options";
 import { SelectTravelsList } from "../Constants/Options";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 export const TravelPlan = () => {
-    const [selectplace, setselectplace] = useState([]); // Now useState is defined
-    const [tripDays, setTripDays] = useState(""); // State to track the number of days
+    
+    
+    const [formData, setFormData] = useState([]);
 
-    // useEffect hook to print tripDays to the console whenever it changes
+    const handleInputChange=(name,value)=>{
+        setFormData({
+
+            ...formData,
+            [name]:value
+        })
+
+    }
+
+    
     useEffect(() => {
-        console.log("Trip Days:", tripDays);
-    }, [tripDays]); // Dependency array ensures it runs when tripDays changes
+
+       
+        
+    }, [formData]); 
+
+    const OnGenerateTrip = () => {
+        if (!formData?.location || !formData?.budget || !formData?.traveller || !formData?.noOfDays) {
+            toast.error("Please fill all details", {
+                position: "top-right",
+                autoClose: 3000, // Automatically closes after 3 seconds
+                hideProgressBar: true,
+            });
+            return;
+        }
+    
+        if (formData?.noOfDays > 7) {
+            toast.warning("Consider shorter trips for better suggestions!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+            });
+        }
+    
+        console.log(formData);
+    };
+    
 
     return (
         <LoadScript googleMapsApiKey="AIzaSyARGxaUcbKuvSeR9ok_RLJiHedU0xrj2oQ"
             libraries={["places"]}>
             <div>
+            <ToastContainer />
                 <div
                     className="head"
                     style={{ position: "absolute", top: "50px", left: "10px" }}
@@ -34,10 +72,10 @@ export const TravelPlan = () => {
                     <GooglePlacesAutocomplete 
                         autocompletionRequest={{ componentRestrictions: { country: "bd" } }}
                         selectProps={{
-                            selectplace,
+                            
                             onChange: (v) => {
-                                setselectplace(v);
-                                console.log(v);
+                                
+                               handleInputChange('location',v)
                             }
                         }}
                     />
@@ -52,8 +90,8 @@ export const TravelPlan = () => {
                     {/* Dropdown or Input field for the number of days */}
                     <input
                         type="number"
-                        value={tripDays}
-                        onChange={(e) => setTripDays(e.target.value)}
+                        
+                        onChange={(e) => handleInputChange('noOfDays',e.target.value)}
                         placeholder="Enter number of days"
                         style={{ padding: "5px", fontSize: "16px" }}
                     />
@@ -75,6 +113,9 @@ export const TravelPlan = () => {
         {SelectBudgetOptions.map((item, index) => (
             <div
                 key={index}
+                
+                onClick={(e) => handleInputChange('budget',item.title)}
+
                 style={{
                     border: "1px solid #ccc",
                     borderRadius: "8px",
@@ -138,6 +179,9 @@ export const TravelPlan = () => {
         {SelectTravelsList.map((item, index) => (
             <div
                 key={index}
+                
+                onClick={(e) => handleInputChange('traveller',item.people)}
+
                 style={{
                     border: "1px solid #ccc",
                     borderRadius: "8px",
@@ -188,7 +232,7 @@ export const TravelPlan = () => {
       <div className="tripbutton"
       style={{ position: "absolute", top: "790px", left: "10px" }}>
       
-    <button>Generate Trip </button>
+    <button onClick={OnGenerateTrip}>Generate Trip </button>
 
       </div>
           
