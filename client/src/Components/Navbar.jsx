@@ -26,6 +26,47 @@ export const Navbar = () => {
         </Typography>
 
         {isLoggedIn ? (
+          
+          <>
+
+           <Button
+              variant="contained"
+              sx={buttonStyle}
+              color="success"
+              component={Link}
+              to="/home"
+            >
+              Home
+            </Button>   
+
+
+
+
+           <Button
+              variant="contained"
+              sx={buttonStyle}
+              color="success"
+              component={Link}
+              to="/userprofile"
+            >
+              User profile
+            </Button>   
+             
+
+
+             
+             <Button
+              variant="contained"
+              sx={buttonStyle}
+              color="success"
+              component={Link}
+              to="/travelplan"
+            >
+              Our Work
+            </Button>
+
+
+
           <Button
             variant="contained"
             sx={buttonStyle}
@@ -34,7 +75,12 @@ export const Navbar = () => {
           >
             Logout
           </Button>
-        ) : (
+
+          </>
+          
+
+
+          ) : (
           <>
             <Button
               variant="contained"
@@ -54,6 +100,13 @@ export const Navbar = () => {
             >
               Signup
             </Button>
+
+
+           
+             
+             
+
+
           </>
         )}
       </Toolbar>

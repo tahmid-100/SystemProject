@@ -9,6 +9,7 @@ import {Home} from "./Components/Home";
 import { Navbar } from "./Components/Navbar";
 
 import {Userprofile} from "./Components/Userprofile";
+import {TravelPlan} from "./Components/TravelPlan"; 
 import ProtectedRoute from "./ProtectedRoute";
 
 
@@ -29,6 +30,8 @@ function App() {
 
                   <Route path="/home" element={<ProtectedRoute component={Home} />} />
                   <Route path="/userprofile" element={<ProtectedRoute component={Userprofile} />} />
+                  <Route path="/travelplan" element={<ProtectedRoute component={TravelPlan} />} />
+                  
                   
                   <Route path="*" element={<Navigate to="/login" />} />
 
