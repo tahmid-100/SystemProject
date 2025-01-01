@@ -14,6 +14,8 @@ import ProtectedRoute from "./ProtectedRoute";
 
 
 
+
+
 function App() {
   const [count, setCount] = useState(0)
   
@@ -21,7 +23,9 @@ function App() {
   return (
     <>
      <BrowserRouter>
-            <Navbar/>                                              
+     
+            <Navbar/> 
+                                                    
             
               <Routes>
                   
@@ -36,6 +40,8 @@ function App() {
                   <Route path="*" element={<Navigate to="/login" />} />
 
               </Routes>
+
+            
           </BrowserRouter>  
      
     </>

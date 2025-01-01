@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react"; // Import useEffect here
 import {  LoadScript } from "@react-google-maps/api";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
-import { SelectBudgetOptions } from "../Constants/Options";
+import { AI_PROMPT, SelectBudgetOptions } from "../Constants/Options";
 import { SelectTravelsList } from "../Constants/Options";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { chatSession } from "../Service/AIModal";
 
 
 export const TravelPlan = () => {
@@ -28,8 +29,8 @@ export const TravelPlan = () => {
         
     }, [formData]); 
 
-    const OnGenerateTrip = () => {
-        if (!formData?.location || !formData?.budget || !formData?.traveller || !formData?.noOfDays) {
+    const OnGenerateTrip = async() => {
+        if (!formData?.location || !formData?.budget || !formData?.traveler || !formData?.noOfDays) {
             toast.error("Please fill all details", {
                 position: "top-right",
                 autoClose: 3000, // Automatically closes after 3 seconds
@@ -46,7 +47,16 @@ export const TravelPlan = () => {
             });
         }
     
-        console.log(formData);
+        const FINAL_PROMPT=AI_PROMPT
+        .replace('{location}',formData?.location?.label)
+        .replace('{totalDays}',formData?.noOfDays)
+        .replace('{traveler}',formData?.traveler)
+        .replace('{budget}',formData?.budget)  
+        .replace('{totalDays}',formData?.noOfDays)
+
+        console.log(FINAL_PROMPT);
+        const result=await chatSession.sendMessage(FINAL_PROMPT);
+        console.log(result?.response?.text());
     };
     
 
@@ -180,7 +190,7 @@ export const TravelPlan = () => {
             <div
                 key={index}
                 
-                onClick={(e) => handleInputChange('traveller',item.people)}
+                onClick={(e) => handleInputChange('traveler',item.people)}
 
                 style={{
                     border: "1px solid #ccc",
