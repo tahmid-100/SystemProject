@@ -106,6 +106,22 @@ const upload = multer({ storage });
         }
     });
 
+     
+    app.get("/getTravelPlans/:userId", async (req, res) => {
+        try {
+            const { userId } = req.params;
+            const travelPlans = await TravelPlan.find({ userId });
+            res.status(200).json(travelPlans);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+
+
+
+
+
 
     app.get("/user/:userId", async (req, res) => {
         try {

@@ -66,6 +66,18 @@ export const Navbar = () => {
             </Button>
 
 
+            <Button
+              variant="contained"
+              sx={buttonStyle}
+              color="success"
+              component={Link}
+              to="/savedplan"
+            >
+              Your Trip
+            </Button>
+
+
+
 
           <Button
             variant="contained"
