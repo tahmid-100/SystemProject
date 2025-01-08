@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { LoadScript, GoogleMap, Marker, InfoWindow, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, Marker, InfoWindow, DirectionsRenderer } from "@react-google-maps/api";
 
 export const Home = () => {
   const [touristSpots, setSpots] = useState([]);
@@ -223,43 +223,41 @@ export const Home = () => {
           )}
 
           <div style={{ height: "400px", width: "100%" }}>
-            <LoadScript googleMapsApiKey="AIzaSyARGxaUcbKuvSeR9ok_RLJiHedU0xrj2oQ">
-              <GoogleMap
-                center={{
+            <GoogleMap
+              center={{
+                lat: parseFloat(selectedSpot.latitude),
+                lng: parseFloat(selectedSpot.longitude),
+              }}
+              zoom={12}
+              mapContainerStyle={{ width: "80%", height: "150%" }}
+            >
+              <Marker
+                position={{
                   lat: parseFloat(selectedSpot.latitude),
                   lng: parseFloat(selectedSpot.longitude),
                 }}
-                zoom={12}
-                mapContainerStyle={{ width: "80%", height: "150%" }}
-              >
+              />
+              {nearbyPlaces.map((place) => (
                 <Marker
-                  position={{
-                    lat: parseFloat(selectedSpot.latitude),
-                    lng: parseFloat(selectedSpot.longitude),
-                  }}
+                  key={place.id}
+                  position={{ lat: place.lat, lng: place.lng }}
+                  title={place.name}
+                  onClick={() => setSelectedPlace(place)}
                 />
-                {nearbyPlaces.map((place) => (
-                  <Marker
-                    key={place.id}
-                    position={{ lat: place.lat, lng: place.lng }}
-                    title={place.name}
-                    onClick={() => setSelectedPlace(place)}
-                  />
-                ))}
-                {selectedPlace && (
-                  <InfoWindow
-                    position={{ lat: selectedPlace.lat, lng: selectedPlace.lng }}
-                    onCloseClick={() => setSelectedPlace(null)}
-                  >
-                    <div>
-                      <h3>{selectedPlace.name}</h3>
-                      <p>{selectedPlace.address}</p>
-                    </div>
-                  </InfoWindow>
-                )}
-                {directions && <DirectionsRenderer directions={directions} />}
-              </GoogleMap>
-            </LoadScript>
+              ))}
+              {selectedPlace && (
+                <InfoWindow
+                  position={{ lat: selectedPlace.lat, lng: selectedPlace.lng }}
+                  onCloseClick={() => setSelectedPlace(null)}
+                >
+                  <div>
+                    <h3>{selectedPlace.name}</h3>
+                    <p>{selectedPlace.address}</p>
+                  </div>
+                </InfoWindow>
+              )}
+              {directions && <DirectionsRenderer directions={directions} />}
+            </GoogleMap>
           </div>
          
         </div>

@@ -7,6 +7,13 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const UserModel = require("./Model/User");
 const TouristSpotModel = require("./Model/TouristSpot");
+const TravelPlan = require("./Model/TripPlanModel");
+const {
+    GoogleGenerativeAI,
+    HarmCategory,
+    HarmBlockThreshold,
+  } = require("@google/generative-ai");
+
 const multer = require("multer");
 const path = require("path");
 const axios = require("axios");
@@ -89,6 +96,15 @@ const upload = multer({ storage });
         }
     });
 
+    app.post("/saveTravelPlan", async (req, res) => {
+        try {
+            const travelPlan = new TravelPlan(req.body);
+            const savedPlan = await travelPlan.save();
+            res.status(201).json(savedPlan);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
 
 
     app.get("/user/:userId", async (req, res) => {
@@ -225,4 +241,10 @@ const upload = multer({ storage });
           res.status(500).json({ error: err.message });
         }
       });
+
+
+
       
+    
+    
+  
