@@ -104,10 +104,13 @@ export const Home = () => {
         padding: "20px",
         fontFamily: "Arial, sans-serif",
         overflowY: "auto",
-        maxHeight: "100vh",
+        maxHeight: "90vh",
+        marginTop: "30px",
+       
+       
       }}
     >
-      <h1>Tourist Spots</h1>
+      <div style={{ textAlign: "center" }}><h2>Tourist Spots</h2></div>
 
       {/* Search Bar */}
       <div style={{ marginBottom: "20px", textAlign: "center" }}>

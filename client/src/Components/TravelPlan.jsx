@@ -1,67 +1,65 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { AI_PROMPT, SelectBudgetOptions } from "../Constants/Options";
 import { SelectTravelsList } from "../Constants/Options";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { chatSession } from "../Service/AIModal";
-import axios from 'axios';
+import axios from "axios";
+import {
+    Box,
+    Button,
+    Container,
+    Grid,
+    Typography,
+    Card,
+    CardContent,
+    TextField,
+    Chip,
+} from "@mui/material";
 
 export const TravelPlan = () => {
-    const [formData, setFormData] = useState([]);
+    const [formData, setFormData] = useState({});
     const userId = localStorage.getItem("userId");
 
     const handleInputChange = (name, value) => {
         setFormData({
             ...formData,
-            [name]: value
+            [name]: value,
         });
-    }
-
-    useEffect(() => {}, [formData]);
+    };
 
     const OnGenerateTrip = async () => {
         if (!formData?.location || !formData?.budget || !formData?.traveler || !formData?.noOfDays) {
-            toast.error("Please fill all details", {
-                position: "top-right",
-                autoClose: 3000, // Automatically closes after 3 seconds
-                hideProgressBar: true,
-            });
+            toast.error("Please fill all details");
             return;
         }
 
         if (formData?.noOfDays > 7) {
-            toast.warning("Consider shorter trips for better suggestions!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-            });
+            toast.warning("Consider shorter trips for better suggestions!");
         }
 
         const FINAL_PROMPT = AI_PROMPT
-            .replace('{location}', formData?.location?.label)
-            .replace('{totalDays}', formData?.noOfDays)
-            .replace('{traveler}', formData?.traveler)
-            .replace('{budget}', formData?.budget)
-            .replace('{totalDays}', formData?.noOfDays);
+            .replace("{location}", formData?.location?.label)
+            .replace("{totalDays}", formData?.noOfDays)
+            .replace("{traveler}", formData?.traveler)
+            .replace("{budget}", formData?.budget);
 
         console.log(FINAL_PROMPT);
-        const result = await chatSession.sendMessage(FINAL_PROMPT);
-        const responseText = await result?.response?.text();
-        console.log(responseText);
-
-        // Save the response in the database
         try {
-            const travelPlanData = JSON.parse(responseText);
-            travelPlanData.userId = userId; // Add userId to the travel plan data
+            const result = await chatSession.sendMessage(FINAL_PROMPT);
+            const responseText = await result?.response?.text();
+            console.log(responseText);
 
-            // Ensure itinerary is correctly structured
-            const formattedItinerary = Object.keys(travelPlanData.itinerary).map(dayKey => {
+            const travelPlanData = JSON.parse(responseText);
+            travelPlanData.userId = userId;
+
+            const formattedItinerary = Object.keys(travelPlanData.itinerary).map((dayKey) => {
                 const dayPlan = travelPlanData.itinerary[dayKey];
                 return {
-                    day: parseInt(dayKey.replace('day', ''), 10),
+                    day: parseInt(dayKey.replace("day", ""), 10),
                     theme: dayPlan.theme,
-                    plan: dayPlan.plan
+                    plan: dayPlan.plan,
                 };
             });
 
@@ -69,195 +67,107 @@ export const TravelPlan = () => {
 
             const response = await axios.post("http://localhost:3001/saveTravelPlan", travelPlanData);
             if (response.status === 201) {
-                toast.success("Travel plan saved successfully!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                });
+                toast.success("Travel plan saved successfully!");
             }
         } catch (error) {
             console.error("Error saving travel plan:", error);
-            toast.error("Failed to save travel plan", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-            });
+            toast.error("Failed to save travel plan");
         }
     };
 
     return (
-        <div>
+        <Container maxWidth="md" sx={{ mt: 10, height: '87vh', overflowY: 'auto'}} >
             <ToastContainer />
-            <div
-                className="head"
-                style={{ position: "absolute", top: "50px", left: "10px" }}
-            >
-                <h1>Travel Plan ⛺</h1>
-                <p>Give some basic information so that we can generate a trip plan</p>
-            </div>
+            <Typography variant="h4" gutterBottom sx={{ marginTop: "0px" }} >
+                Travel Plan ⛺
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3 }}>
+                Provide some basic information to generate your travel plan
+            </Typography>
 
-            <div
-                className="destination"
-                style={{ position: "absolute", top: "170px", left: "10px" }}
-            >
-                <p>What is your Destination?</p>
+            <Grid container spacing={3}>
+                {/* Destination */}
+                <Grid item xs={12}>
+                    <Typography variant="h6">What is your Destination?</Typography>
+                    <GooglePlacesAutocomplete
+                        autocompletionRequest={{ componentRestrictions: { country: "bd" } }}
+                        selectProps={{
+                            onChange: (v) => handleInputChange("location", v),
+                        }}
+                    />
+                </Grid>
 
-                <GooglePlacesAutocomplete 
-                    autocompletionRequest={{ componentRestrictions: { country: "bd" } }}
-                    selectProps={{
-                        onChange: (v) => {
-                            handleInputChange('location',v)
-                        }
-                    }}
-                />
-            </div>
+                {/* Number of Days */}
+                <Grid item xs={12}>
+                    <Typography variant="h6">How many days are you planning your trip?</Typography>
+                    <TextField
+                        fullWidth
+                        type="number"
+                        variant="outlined"
+                        placeholder="Enter number of days"
+                        onChange={(e) => handleInputChange("noOfDays", e.target.value)}
+                    />
+                </Grid>
 
-            <div
-                className="time"
-                style={{ position: "absolute", top: "280px", left: "10px" }}
-            >
-                <p>How many days are you planning your trip?</p>
+                {/* Budget */}
+                <Grid item xs={12}>
+                    <Typography variant="h6">What is your budget?</Typography>
+                    <Grid container spacing={2}>
+                        {SelectBudgetOptions.map((item, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={index}>
+                                <Card
+                                    sx={{
+                                        cursor: "pointer",
+                                        "&:hover": {
+                                            transform: "scale(1.05)",
+                                            boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                                        },
+                                    }}
+                                    onClick={() => handleInputChange("budget", item.title)}
+                                >
+                                    <CardContent>
+                                        <Typography variant="h5">{item.icon}</Typography>
+                                        <Typography variant="h6">{item.title}</Typography>
+                                        <Typography variant="body2">{item.desc}</Typography>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Grid>
 
-                <input
-                    type="number"
-                    onChange={(e) => handleInputChange('noOfDays',e.target.value)}
-                    placeholder="Enter number of days"
-                    style={{ padding: "5px", fontSize: "16px" }}
-                />
-            </div>
-            
-            <div
-                className="budget"
-                style={{ position: "absolute", top: "390px", left: "10px" }}
-            >
-                <p>What is your budget?</p>
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "20px",
-                        marginTop: "10px",
-                        flexWrap: "wrap",
-                    }}
+                {/* Traveler */}
+                <Grid item xs={12}>
+                    <Typography variant="h6">
+                        Who do you plan to travel with on your next adventure?
+                    </Typography>
+                    <Grid container spacing={2}>
+                        {SelectTravelsList.map((item, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={index}>
+                                <Chip
+                                    label={item.title}
+                                    variant={formData.traveler === item.people ? "filled" : "outlined"}
+                                    color="primary"
+                                    onClick={() => handleInputChange("traveler", item.people)}
+                                    sx={{ width: "100%", p: 2, fontSize: "1rem" }}
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <Box mt={4}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    size="large"
+                    onClick={OnGenerateTrip}
                 >
-                    {SelectBudgetOptions.map((item, index) => (
-                        <div
-                            key={index}
-                            onClick={(e) => handleInputChange('budget',item.title)}
-                            style={{
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "15px",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                                textAlign: "center",
-                                backgroundColor: "#fff",
-                                width: "200px",
-                                transition: "transform 0.3s, box-shadow 0.3s",
-                                cursor: "pointer",
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = "scale(1.05)";
-                                e.currentTarget.style.boxShadow =
-                                    "0 8px 16px rgba(0, 0, 0, 0.2)";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = "scale(1)";
-                                e.currentTarget.style.boxShadow =
-                                    "0 4px 8px rgba(0, 0, 0, 0.1)";
-                            }}
-                        >
-                            <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "10px",
-                                }}
-                            >
-                                <h2 style={{ fontSize: "24px", margin: "0" }}>{item.icon}</h2>
-                                <h3 style={{ fontSize: "20px", margin: "0" }}>{item.title}</h3>
-                            </div>
-                            <p
-                                style={{
-                                    fontSize: "16px",
-                                    color: "#666",
-                                    margin: "10px 0 0 0",
-                                    textAlign: "left",
-                                }}
-                            >
-                                {item.desc}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-    
-            <div
-                className="budget"
-                style={{ position: "absolute", top: "590px", left: "10px" }}
-            >
-                <p>Who do you plan on traveling with your next adventure?</p>
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "20px",
-                        marginTop: "10px",
-                        flexWrap: "wrap",
-                    }}
-                >
-                    {SelectTravelsList.map((item, index) => (
-                        <div
-                            key={index}
-                            onClick={(e) => handleInputChange('traveler',item.people)}
-                            style={{
-                                border: "1px solid #ccc",
-                                borderRadius: "8px",
-                                padding: "15px",
-                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                                textAlign: "center",
-                                backgroundColor: "#fff",
-                                width: "200px",
-                                transition: "transform 0.3s, box-shadow 0.3s",
-                                cursor: "pointer",
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = "scale(1.05)";
-                                e.currentTarget.style.boxShadow =
-                                    "0 8px 16px rgba(0, 0, 0, 0.2)";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = "scale(1)";
-                                e.currentTarget.style.boxShadow =
-                                    "0 4px 8px rgba(0, 0, 0, 0.1)";
-                            }}
-                        >
-                            <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "10px",
-                                }}
-                            >
-                                <h2 style={{ fontSize: "24px", margin: "0" }}>{item.icon}</h2>
-                                <h3 style={{ fontSize: "20px", margin: "0" }}>{item.title}</h3>
-                            </div>
-                            <p
-                                style={{
-                                    fontSize: "16px",
-                                    color: "#666",
-                                    margin: "10px 0 0 0",
-                                    textAlign: "left",
-                                }}
-                            >
-                                {item.desc}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className="tripbutton"
-                style={{ position: "absolute", top: "790px", left: "10px" }}>
-                <button onClick={OnGenerateTrip}>Generate Trip</button>
-            </div>
-        </div>
+                    Generate Trip
+                </Button>
+            </Box>
+        </Container>
     );
 };

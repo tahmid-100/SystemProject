@@ -1,12 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Grid, Button, Paper, TextField, Typography } from "@mui/material";
-
-const paperStyle = { padding: '20px', height: '50vh', width: 400, margin: '20px auto' };
-const heading = { margin: '20px 0' };
-const btnStyle = { marginTop: '20px' };
-const row = { marginBottom: '10px' };
+import { useNavigate } from "react-router-dom";
+import { Container, TextField, Button, Typography, Box, Paper } from "@mui/material";
 
 export const Login = () => {
     // Define state variables for form fields
@@ -20,54 +15,71 @@ export const Login = () => {
         e.preventDefault();
         axios.post("http://localhost:3001/login", { email, password })
             .then(result => {
-               
                 if (result.data.message === "Success") {
-
                     const user = result.data.user;
-                    
                     // Store the user's _id in localStorage or state
                     localStorage.setItem("authToken", "user-token-example");
-
                     localStorage.setItem("userId", user._id);
                     console.log(user._id);
-        
-
                     navigate("/home");
                 } else {
-                    alert("Login failed");
+                    alert("Login failed. Please check your credentials.");
                 }
             })
-            .catch(err => console.log(err));
+            .catch(error => {
+                console.error("Error logging in:", error);
+                alert("An error occurred. Please try again.");
+            });
     };
 
     return (
-        <Grid align="center" className="wrapper">
-            <Paper style={paperStyle}>
-                <Typography component="h1" variant="h5" style={heading}>Login</Typography>
+        <Box
+            sx={{
+                backgroundImage: `url('/photos/login.jpg')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed',
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}
+        >
+          <Paper elevation={6} sx={{ padding: 4, maxWidth: 800, width: '40%' }}>
+                <Typography variant="h4" gutterBottom>
+                    Login
+                </Typography>
                 <form onSubmit={handleLogin}>
                     <TextField
-                        style={row}
-                        fullWidth
                         label="Email"
-                        variant="outlined"
                         type="email"
-                        placeholder="Enter Email"
-                        name="email"
+                        fullWidth
+                        margin="normal"
+                        value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        required
                     />
                     <TextField
-                        style={row}
-                        fullWidth
                         label="Password"
-                        variant="outlined"
                         type="password"
-                        placeholder="Enter Password"
-                        name="password"
+                        fullWidth
+                        margin="normal"
+                        value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
                     />
-                    <Button style={btnStyle} variant="contained" type="submit">Login</Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        sx={{ mt: 2 }}
+                    >
+                        Login
+                    </Button>
                 </form>
             </Paper>
-        </Grid>
+        </Box>
     );
 };

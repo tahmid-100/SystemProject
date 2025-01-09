@@ -1,14 +1,14 @@
 /* Container for the profile */
 .user-profile {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    height: 100vh; /* Full viewport height */
+    max-height: 88vh; /* Full viewport height */
     overflow-y: auto; /* Enable scrolling */
-    margin-top: 150px;
+    margin-top: 50px;
 }
 
 /* Header */

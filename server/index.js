@@ -227,6 +227,17 @@ const upload = multer({ storage });
         }
     });
     
+
+    app.delete('/deleteTravelPlan/:id', async (req, res) => {
+        try {
+            const { id } = req.params;
+            await TravelPlan.findByIdAndDelete(id);
+            res.status(200).json({ message: "Plan deleted successfully" });
+        } catch (error) {
+            res.status(500).json({ message: "Error deleting plan", error });
+        }
+    });
+    
     
 
 

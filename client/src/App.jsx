@@ -8,7 +8,7 @@ import { Home } from "./Components/Home";
 import { Navbar } from "./Components/Navbar";
 import { Userprofile } from "./Components/Userprofile";
 import { TravelPlan } from "./Components/TravelPlan"; 
-import { Savedplan}  from "./Components/Savedplan"; 
+import { SavedPlan } from "./Components/Savedplan"; 
 import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
             <Route path="/home" element={<ProtectedRoute component={Home} />} />
             <Route path="/userprofile" element={<ProtectedRoute component={Userprofile} />} />
             <Route path="/travelplan" element={<ProtectedRoute component={TravelPlan} />} />
-            <Route path="/savedplan" element={<ProtectedRoute component={Savedplan} />} />
+            <Route path="/savedplan" element={<ProtectedRoute component={SavedPlan} />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </BrowserRouter>

@@ -1,16 +1,10 @@
 import React, { useState } from "react";
-import { Grid, Paper, Typography, TextField, Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-import axios from "axios"
-
-const paperStyle = { padding: '20px', height: '60vh', width: 400, margin: '20px auto' };
-const heading = { margin: '20px 0' };
-const btnStyle = { marginTop: '20px' };
-const row = { marginBottom: '10px' };
+import { Container, TextField, Button, Typography, Box, Paper } from "@mui/material";
 
 export const SignUp = () => {
+    // Define state variables for form fields
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -18,76 +12,84 @@ export const SignUp = () => {
     const navigate = useNavigate();
 
     // Handle form submission
-    const handleSignup = (e) => {
+    const handleSignUp = (e) => {
         e.preventDefault();
         axios.post("http://localhost:3001/signup", { name, email, password })
-        .then(result => {
-            if (result.status === 201) {
-                navigate("/login");
-            }
-        })
-        .catch(err => {
-            if (err.response && err.response.status === 400) {
-                window.alert("Email already exists. Please use a different email.");
-            } else {
-                console.log(err);
-            }
-        });
+            .then(result => {
+                if (result.data.message === "Success") {
+                    const user = result.data.user;
+                    // Store the user's _id in localStorage or state
+                    localStorage.setItem("authToken", "user-token-example");
+                    localStorage.setItem("userId", user._id);
+                    console.log(user._id);
+                    navigate("/home");
+                } else {
+                    alert("Signup failed. Please check your details.");
+                }
+            })
+            .catch(error => {
+                console.error("Error signing up:", error);
+                alert("An error occurred. Please try again.");
+            });
     };
 
     return (
-        <Grid align="center" className="wrapper">
-            <Paper style={paperStyle} sx={{
-                width: {
-                    xs: '80vw', // 0
-                    sm: '50vw', // 600
-                    md: '40vw', // 900
-                    lg: '30vw', // 1200
-                    xl: '20vw', // 1536
-                },
-                height: {
-                    lg: '60vh', // 1200px and up
-                }
-            }}>
-                <Typography component="h1" variant="h5" style={heading}> Signup </Typography>
-                <form onSubmit={handleSignup}>
+        <Box
+            sx={{
+                backgroundImage: `url('/photos/signup.jpg')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed',
+                height: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}
+        >
+            <Paper elevation={6} sx={{ padding: 4, maxWidth: 800, width: '40%' }}>
+                <Typography variant="h4" gutterBottom>
+                    Sign Up
+                </Typography>
+                <form onSubmit={handleSignUp}>
                     <TextField
-                        style={row}
-                        sx={{ label: { fontWeight: '700', fontSize: "1.3rem" } }}
-                        fullWidth
+                        label="Name"
                         type="text"
-                        label="Enter Name"
-                        name="name"
+                        fullWidth
+                        margin="normal"
+                        value={name}
                         onChange={(e) => setName(e.target.value)}
+                        required
                     />
                     <TextField
-                        style={row}
-                        sx={{ label: { fontWeight: '700', fontSize: "1.3rem" } }}
-                        fullWidth
                         label="Email"
-                        variant="outlined"
                         type="email"
-                        placeholder="Enter Email"
-                        name="email"
+                        fullWidth
+                        margin="normal"
+                        value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        required
                     />
                     <TextField
-                        style={row}
-                        sx={{ label: { fontWeight: '700', fontSize: "1.3rem" } }}
-                        fullWidth
                         label="Password"
-                        variant="outlined"
                         type="password"
-                        placeholder="Enter Password"
-                        name="password"
+                        fullWidth
+                        margin="normal"
+                        value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
                     />
-                    <Button style={btnStyle} variant="contained" type="submit">
-                        SignUp
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        sx={{ mt: 2 }}
+                    >
+                        Sign Up
                     </Button>
                 </form>
-               
             </Paper>
-        </Grid>
+        </Box>
     );
 };
