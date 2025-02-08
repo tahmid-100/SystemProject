@@ -9,6 +9,7 @@ import { Navbar } from "./Components/Navbar";
 import { Userprofile } from "./Components/Userprofile";
 import { TravelPlan } from "./Components/TravelPlan"; 
 import { SavedPlan } from "./Components/Savedplan"; 
+import {Chatbot} from "./Components/Chatbot";
 import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
             <Route path="/userprofile" element={<ProtectedRoute component={Userprofile} />} />
             <Route path="/travelplan" element={<ProtectedRoute component={TravelPlan} />} />
             <Route path="/savedplan" element={<ProtectedRoute component={SavedPlan} />} />
+            <Route path="/api/chatbot" element={<ProtectedRoute component={Chatbot} />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </BrowserRouter>

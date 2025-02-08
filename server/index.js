@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bodyParser = require('body-parser');
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
 const session = require("express-session");
@@ -105,6 +106,75 @@ const upload = multer({ storage });
             res.status(500).json({ error: error.message });
         }
     });
+
+
+    const touristSpots = require('./Json/list.json').touristSpots;
+
+ 
+    app.post('/api/chatbot', (req, res) => {
+        const userQuery = req.body.query.toLowerCase();
+      
+        let response = { success: false, message: 'No matching information found.' };
+      
+        // Check for place details
+        if (userQuery.includes('tell me about') || userQuery.includes('describe')) {
+          const placeName = userQuery.replace('tell me about', '').replace('describe', '').trim();
+          const place = touristSpots.find(spot => spot.placeName.toLowerCase().includes(placeName));
+          if (place) {
+            response = { success: true, data: place };
+          }
+        }
+      
+        // Check for hotels
+        else if (userQuery.includes('hotels') || userQuery.includes('stay')) {
+          const placeName = userQuery.replace('hotels', '').replace('stay', '').trim();
+          const place = touristSpots.find(spot => spot.placeName.toLowerCase().includes(placeName));
+          if (place) {
+            response = { success: true, data: place.hotels };
+          }
+        }
+      
+        // Check for ticket pricing
+        else if (userQuery.includes('cost') || userQuery.includes('ticket')) {
+          const placeName = userQuery.replace('cost', '').replace('ticket', '').trim();
+          const place = touristSpots.find(spot => spot.placeName.toLowerCase().includes(placeName));
+          if (place) {
+            response = { success: true, data: { ticketPricing: place.ticketPricing } };
+          }
+        }
+      
+        // Check for best time to visit
+        else if (userQuery.includes('best time') || userQuery.includes('when to visit')) {
+          const placeName = userQuery.replace('best time', '').replace('when to visit', '').trim();
+          const place = touristSpots.find(spot => spot.placeName.toLowerCase().includes(placeName));
+          if (place) {
+            response = { success: true, data: { timeToTravel: place.timeToTravel } };
+          }
+        }
+      
+        // Default search
+        else {
+          const results = touristSpots.filter(spot => 
+            spot.placeName.toLowerCase().includes(userQuery) || 
+            spot.description.toLowerCase().includes(userQuery) ||
+            spot.placeDetails.toLowerCase().includes(userQuery)
+          );
+          if (results.length > 0) {
+            response = { success: true, data: results };
+          }
+        }
+      
+        res.json(response);
+      });
+
+
+
+
+
+
+
+
+
 
      
     app.get("/getTravelPlans/:userId", async (req, res) => {

@@ -145,6 +145,14 @@ export const Navbar = () => {
             </ListItemIcon>
             <ListItemText primary="Your Trip" sx={{ color: '#fff' }} />
           </ListItem>
+          
+          <ListItem button component={Link} to="/api/chatbot" onClick={toggleSidebar}>
+            <ListItemIcon sx={{ color: '#fff' }}>
+              <HomeIcon />
+            </ListItemIcon>
+            <ListItemText primary="Chatbot" sx={{ color: '#fff' }} />
+          </ListItem>
+
         </List>
 
         {/* Logout Button */}

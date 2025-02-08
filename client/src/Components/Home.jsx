@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { GoogleMap, Marker, InfoWindow, DirectionsRenderer } from "@react-google-maps/api";
+import Weather from "./Weather"; // Import the Weather component
 
 export const Home = () => {
   const [touristSpots, setSpots] = useState([]);
@@ -106,8 +107,6 @@ export const Home = () => {
         overflowY: "auto",
         maxHeight: "90vh",
         marginTop: "30px",
-       
-       
       }}
     >
       <div style={{ textAlign: "center" }}><h2>Tourist Spots</h2></div>
@@ -225,44 +224,48 @@ export const Home = () => {
             </div>
           )}
 
-          <div style={{ height: "400px", width: "100%" }}>
-            <GoogleMap
-              center={{
-                lat: parseFloat(selectedSpot.latitude),
-                lng: parseFloat(selectedSpot.longitude),
-              }}
-              zoom={12}
-              mapContainerStyle={{ width: "80%", height: "150%" }}
-            >
-              <Marker
-                position={{
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ height: "400px", width: "100%" }}>
+              <GoogleMap
+                center={{
                   lat: parseFloat(selectedSpot.latitude),
                   lng: parseFloat(selectedSpot.longitude),
                 }}
-              />
-              {nearbyPlaces.map((place) => (
+                zoom={12}
+                mapContainerStyle={{ width: "100%", height: "100%" }}
+              >
                 <Marker
-                  key={place.id}
-                  position={{ lat: place.lat, lng: place.lng }}
-                  title={place.name}
-                  onClick={() => setSelectedPlace(place)}
+                  position={{
+                    lat: parseFloat(selectedSpot.latitude),
+                    lng: parseFloat(selectedSpot.longitude),
+                  }}
                 />
-              ))}
-              {selectedPlace && (
-                <InfoWindow
-                  position={{ lat: selectedPlace.lat, lng: selectedPlace.lng }}
-                  onCloseClick={() => setSelectedPlace(null)}
-                >
-                  <div>
-                    <h3>{selectedPlace.name}</h3>
-                    <p>{selectedPlace.address}</p>
-                  </div>
-                </InfoWindow>
-              )}
-              {directions && <DirectionsRenderer directions={directions} />}
-            </GoogleMap>
+                {nearbyPlaces.map((place) => (
+                  <Marker
+                    key={place.id}
+                    position={{ lat: place.lat, lng: place.lng }}
+                    title={place.name}
+                    onClick={() => setSelectedPlace(place)}
+                  />
+                ))}
+                {selectedPlace && (
+                  <InfoWindow
+                    position={{ lat: selectedPlace.lat, lng: selectedPlace.lng }}
+                    onCloseClick={() => setSelectedPlace(null)}
+                  >
+                    <div>
+                      <h3>{selectedPlace.name}</h3>
+                      <p>{selectedPlace.address}</p>
+                    </div>
+                  </InfoWindow>
+                )}
+                {directions && <DirectionsRenderer directions={directions} />}
+              </GoogleMap>
+            </div>
+
+            {/* Weather Component */}
+            <Weather lat={selectedSpot.latitude} lon={selectedSpot.longitude} />
           </div>
-         
         </div>
       )}
     </div>

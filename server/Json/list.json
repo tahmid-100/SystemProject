@@ -1,0 +1,577 @@
+{
+  "touristSpots": [
+    {
+      "placeName": "Cox's Bazar",
+      "geoCoordinates": {"latitude": 21.4443, "longitude": 92.0061},
+      "description": "The longest natural sea beach in the world, offering stunning sunsets, surfing, and beach activities.",
+      "imageUrl": "placeholder_coxsbazar.jpg",
+      "placeDetails": "Endless beach, Burmese market, Himchari Waterfall, Inani Beach.",
+      "placeImageUrl": "placeholder_coxsbazar_details.jpg",
+      "ticketPricing": "Free access to the beach.",
+      "timeToTravel": "Best time is October to March.",
+      "hotels": [
+        {
+          "hotelName": "Sayeman Beach Resort",
+          "hotelAddress": "Marine Drive, Cox's Bazar",
+          "price": "8000-15000 BDT",
+          "hotelImageUrl": "placeholder_sayeman.jpg",
+          "geoCoordinates": {"latitude": 21.4393, "longitude": 92.0031},
+          "rating": 4.5,
+          "description": "Luxury resort with ocean views, multiple restaurants, and a spa."
+        },
+        {
+          "hotelName": "Hotel Sea Crown",
+          "hotelAddress": "Marine Drive, Kolatoli, Cox's Bazar",
+          "price": "5000-10000 BDT",
+          "hotelImageUrl": "placeholder_seacrown.jpg",
+          "geoCoordinates": {"latitude": 21.4313, "longitude": 92.0001},
+          "rating": 4.0,
+          "description": "Comfortable hotel near the beach with a rooftop restaurant."
+        }
+      ]
+    },
+    {
+      "placeName": "Sundarbans",
+      "geoCoordinates": {"latitude": 22.0000, "longitude": 89.5000},
+      "description": "The world's largest mangrove forest, home to the Royal Bengal Tiger.",
+      "imageUrl": "placeholder_sundarbans.jpg",
+      "placeDetails": "Wildlife sanctuaries, mangrove forests, river cruises, Kotka, Kochikhali.",
+      "placeImageUrl": "placeholder_sundarbans_details.jpg",
+      "ticketPricing": "Varies depending on tour operator and park entry fees (approx. 1000-3000 BDT).",
+      "timeToTravel": "October to April (dry season).",
+      "hotels": [
+        {
+          "hotelName": "Parjatan Hotel",
+          "hotelAddress": "Mongla, Bagerhat (near Sundarbans)",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_parjatan.jpg",
+          "geoCoordinates": {"latitude": 22.5167, "longitude": 89.5833},
+          "rating": 3.5,
+          "description": "Government-run hotel, basic but conveniently located."
+        },
+        {
+          "hotelName": "Tiger Garden International Hotel",
+          "hotelAddress": "Khulna (near Sundarbans)",
+          "price": "6000-12000 BDT",
+          "hotelImageUrl": "placeholder_tigergarden.jpg",
+          "geoCoordinates": {"latitude": 22.8167, "longitude": 89.5500},
+          "rating": 4.0,
+          "description": "A well-regarded option in Khulna, a gateway city to the Sundarbans."
+        }
+      ]
+    },
+    {
+      "placeName": "Saint Martin's Island",
+      "geoCoordinates": {"latitude": 20.6239, "longitude": 92.3239},
+      "description": "A small coral island offering pristine beaches, clear waters, and snorkeling opportunities.",
+      "imageUrl": "placeholder_stmartins.jpg",
+      "placeDetails": "Coral reefs, beaches, coconut groves, Chera Dwip.",
+      "placeImageUrl": "placeholder_stmartins_details.jpg",
+      "ticketPricing": "Ferry from Teknaf (approx. 500-1000 BDT).",
+      "timeToTravel": "November to February (peak season).",
+      "hotels": [
+        {
+          "hotelName": "Blue Marine Resort",
+          "hotelAddress": "Saint Martin's Island",
+          "price": "4000-8000 BDT",
+          "hotelImageUrl": "placeholder_bluemarine.jpg",
+          "geoCoordinates": {"latitude": 20.6219, "longitude": 92.3219},
+          "rating": 4.0,
+          "description": "Beachfront resort with comfortable rooms."
+        },
+        {
+          "hotelName": "Hotel Sea Pearl Resort & Spa Saint Martin",
+          "hotelAddress": "Saint Martin's Island",
+          "price": "6000-12000 BDT",
+          "hotelImageUrl": "placeholder_seapearl.jpg",
+          "geoCoordinates": {"latitude": 20.6209, "longitude": 92.3209},
+          "rating": 4.2,
+          "description": "A good choice"
+        }
+      ]
+    },
+    {
+        "placeName": "Sylhet",
+        "geoCoordinates": {"latitude": 24.8949, "longitude": 91.8687},
+        "description": "Known for its tea gardens, lush green hills, and spiritual shrines.",
+        "imageUrl": "placeholder_sylhet.jpg",
+        "placeDetails": "Tea gardens (Lakkatura, Malnicherra), Shrine of Hazrat Shahjalal, Shrine of Hazrat Shah Paran, Jaflong.",
+        "placeImageUrl": "placeholder_sylhet_details.jpg",
+        "ticketPricing": "Entry fees to gardens vary (approx. 50-200 BDT).",
+        "timeToTravel": "October to March (pleasant weather).",
+        "hotels": [
+          {
+            "hotelName": "Grand Sylhet Hotel & Resort",
+            "hotelAddress": "Airport Road, Sylhet",
+            "price": "7000-14000 BDT",
+            "hotelImageUrl": "placeholder_grandsylhet.jpg",
+            "geoCoordinates": {"latitude": 24.9049, "longitude": 91.8587},
+            "rating": 4.3,
+            "description": "Luxurious resort with modern amenities."
+          },
+          {
+            "hotelName": "Hotel Metro International",
+            "hotelAddress": "Dargah Gate, Sylhet",
+            "price": "4000-8000 BDT",
+            "hotelImageUrl": "placeholder_metro.jpg",
+            "geoCoordinates": {"latitude": 24.8999, "longitude": 91.8637},
+            "rating": 3.8,
+            "description": "Conveniently located hotel near the shrines."
+          }
+        ]
+      },
+      {
+        "placeName": "Jaflong",
+        "geoCoordinates": {"latitude": 25.1372, "longitude": 92.0139},
+        "description": "A scenic area bordering India, known for its stone collection and natural beauty.",
+        "imageUrl": "placeholder_jaflong.jpg",
+        "placeDetails": "Piyain River, Dauki River, Stone collection, Tribal culture.",
+        "placeImageUrl": "placeholder_jaflong_details.jpg",
+        "ticketPricing": "Boat rides on the river (approx. 200-500 BDT).",
+        "timeToTravel": "October to April (avoid monsoon season).",
+        "hotels": [
+          {
+            "hotelName": "Jaflong Inn",
+            "hotelAddress": "Jaflong",
+            "price": "2500-5000 BDT",
+            "hotelImageUrl": "placeholder_jaflonginn.jpg",
+            "geoCoordinates": {"latitude": 25.1352, "longitude": 92.0119},
+            "rating": 3.5,
+            "description": "Basic accommodation in Jaflong."
+          },
+          {
+            "hotelName": "Zilan Park",
+            "hotelAddress": "Near Jaflong",
+            "price": "3000-6000 BDT",
+            "hotelImageUrl": "placeholder_zilanpark.jpg",
+            "geoCoordinates": {"latitude": 25.1402, "longitude": 92.0169},
+            "rating": 3.7,
+            "description": "A park with some lodging options."
+          }
+        ]
+      },
+    {
+      "placeName": "Lalbagh Fort",
+      "geoCoordinates": {"latitude": 23.7154, "longitude": 90.3830},
+      "description": "An incomplete Mughal fort complex dating back to the 17th century.",
+      "imageUrl": "placeholder_lalbagh.jpg",
+      "placeDetails": "Diwan-i-Aam, Bibi Pari's Mausoleum, Fort Museum.",
+      "placeImageUrl": "placeholder_lalbagh_details.jpg",
+      "ticketPricing": "20 BDT (Bangladeshi citizens), 200 BDT (foreigners).",
+      "timeToTravel": "All year round.  Avoid peak heat in summer.",
+      "hotels": [
+        {
+          "hotelName": "Hotel 71",
+          "hotelAddress": "Purana Paltan, Dhaka (near Lalbagh)",
+          "price": "4000-8000 BDT",
+          "hotelImageUrl": "placeholder_hotel71.jpg",
+          "geoCoordinates": {"latitude": 23.7254, "longitude": 90.4030},
+          "rating": 4.0,
+          "description": "Modern hotel in the old city."
+        },
+        {
+          "hotelName": "Hotel Victory",
+          "hotelAddress": "Near Sadarghat, Dhaka (near Lalbagh)",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_hotelvictory.jpg",
+          "geoCoordinates": {"latitude": 23.7054, "longitude": 90.3730},
+          "rating": 3.5,
+          "description": "Affordable option in a bustling area."
+        }
+      ]
+    },
+    {
+      "placeName": "Ahsan Manzil (Pink Palace)",
+      "geoCoordinates": {"latitude": 23.7104, "longitude": 90.4080},
+      "description": "A historical palace on the banks of the Buriganga River in Dhaka.",
+      "imageUrl": "placeholder_ahsanmanzil.jpg",
+      "placeDetails": "Museum showcasing the lifestyle of the Nawabs of Dhaka.",
+      "placeImageUrl": "placeholder_ahsanmanzil_details.jpg",
+      "ticketPricing": "20 BDT (Bangladeshi citizens), 500 BDT (foreigners).",
+      "timeToTravel": "All year round.  Avoid peak heat in summer.",
+      "hotels": [
+        {
+          "hotelName": "Pan Pacific Sonargaon Dhaka",
+          "hotelAddress": "Karwan Bazar, Dhaka (relatively near)",
+          "price": "10000-25000 BDT",
+          "hotelImageUrl": "placeholder_sonargaon.jpg",
+          "geoCoordinates": {"latitude": 23.7454, "longitude": 90.3880},
+          "rating": 4.5,
+          "description": "Luxury hotel with excellent facilities. (A bit further away)"
+        },
+        {
+          "hotelName": "Hotel Bengal Blueberry",
+          "hotelAddress": "Near Gulshan 2, Dhaka (requires travel)",
+          "price": "6000-12000 BDT",
+          "hotelImageUrl": "placeholder_blueberry.jpg",
+          "geoCoordinates": {"latitude": 23.7954, "longitude": 90.4280},
+          "rating": 4.2,
+          "description": "Modern and comfortable hotel (requires some travel)."
+        }
+      ]
+    },
+        {
+      "placeName": "Sonargaon",
+      "geoCoordinates": {"latitude": 23.6564, "longitude": 90.5967},
+      "description": "A historical city, once the capital of Bengal, featuring Panam City and the Folk Arts and Crafts Museum.",
+      "imageUrl": "placeholder_sonargaon.jpg",
+      "placeDetails": "Panam City, Folk Arts and Crafts Museum, Goaldi Mosque.",
+      "placeImageUrl": "placeholder_sonargaon_details.jpg",
+      "ticketPricing": "Museum entry fee (approx. 50-100 BDT).",
+      "timeToTravel": "October to March (pleasant weather).",
+      "hotels": [
+        {
+          "hotelName": "Meghna Village Holiday Resort",
+          "hotelAddress": "Meghna Ghat, Sonargaon (near)",
+          "price": "4000-8000 BDT",
+          "hotelImageUrl": "placeholder_meghnavillage.jpg",
+          "geoCoordinates": {"latitude": 23.6764, "longitude": 90.5767},
+          "rating": 3.8,
+          "description": "Resort near the Meghna River."
+        },
+        {
+          "hotelName": "Resort Atlantis",
+          "hotelAddress": "Sonargaon",
+          "price": "5000-10000 BDT",
+          "hotelImageUrl": "placeholder_resortatlantis.jpg",
+          "geoCoordinates": {"latitude": 23.6664, "longitude": 90.5867},
+          "rating": 4.0,
+          "description": "Resort with family friendly atmosphere."
+        }
+      ]
+    },
+        {
+      "placeName": "Srimangal",
+      "geoCoordinates": {"latitude": 24.3077, "longitude": 91.7350},
+      "description": "Known as the 'Tea Capital' of Bangladesh, with beautiful tea gardens and rolling hills.",
+      "imageUrl": "placeholder_srimangal.jpg",
+      "placeDetails": "Lawachara National Park, Madhabpur Lake, Tea Gardens.",
+      "placeImageUrl": "placeholder_srimangal_details.jpg",
+      "ticketPricing": "Park entry fees (approx. 50-200 BDT).",
+      "timeToTravel": "October to March (best weather).",
+      "hotels": [
+        {
+          "hotelName": "Grand Sultan Tea Resort & Golf",
+          "hotelAddress": "Srimangal",
+          "price": "8000-20000 BDT",
+          "hotelImageUrl": "placeholder_grandsultan.jpg",
+          "geoCoordinates": {"latitude": 24.3277, "longitude": 91.7550},
+          "rating": 4.5,
+          "description": "Luxury resort with golf course and excellent amenities."
+        },
+        {
+          "hotelName": "Tea Heaven Resort",
+          "hotelAddress": "Srimangal",
+          "price": "5000-10000 BDT",
+          "hotelImageUrl": "placeholder_teaheaven.jpg",
+          "geoCoordinates": {"latitude": 24.3177, "longitude": 91.7450},
+          "rating": 4.0,
+          "description": "Resort surrounded by tea gardens."
+        }
+      ]
+    },
+        {
+      "placeName": "Rangamati",
+      "geoCoordinates": {"latitude": 22.6561, "longitude": 92.1906},
+      "description": "A scenic district in the Chittagong Hill Tracts, known for Kaptai Lake and tribal culture.",
+      "imageUrl": "placeholder_rangamati.jpg",
+      "placeDetails": "Kaptai Lake, Hanging Bridge, Rajbari, Tribal Museum.",
+      "placeImageUrl": "placeholder_rangamati_details.jpg",
+      "ticketPricing": "Boat rides on Kaptai Lake (approx. 300-800 BDT).",
+      "timeToTravel": "October to March (pleasant weather).",
+      "hotels": [
+        {
+          "hotelName": "Hotel Green Castle",
+          "hotelAddress": "Rangamati",
+          "price": "3500-7000 BDT",
+          "hotelImageUrl": "placeholder_greencastle.jpg",
+          "geoCoordinates": {"latitude": 22.6661, "longitude": 92.2006},
+          "rating": 3.7,
+          "description": "Hotel with views of Kaptai Lake."
+        },
+        {
+          "hotelName": "Parjatan Motel",
+          "hotelAddress": "Rangamati",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_parjatanrangamati.jpg",
+          "geoCoordinates": {"latitude": 22.6461, "longitude": 92.1806},
+          "rating": 3.5,
+          "description": "Government-run motel with basic amenities."
+        }
+      ]
+    },
+
+    {
+      "placeName": "Bandarban",
+      "geoCoordinates": {"latitude": 22.1906, "longitude": 92.2197},
+      "description": "Another hill district in the Chittagong Hill Tracts, known for its mountains, waterfalls, and tribal villages.",
+      "imageUrl": "placeholder_bandarban.jpg",
+      "placeDetails": "Nilgiri, Boga Lake, Keokradong, Sangu River.",
+      "placeImageUrl": "placeholder_bandarban_details.jpg",
+      "ticketPricing": "Jeep rentals to Nilgiri (approx. 5000-8000 BDT per day).",
+      "timeToTravel": "October to March (dry season).",
+      "hotels": [
+        {
+          "hotelName": "Hotel Hill View",
+          "hotelAddress": "Bandarban",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_hillview.jpg",
+          "geoCoordinates": {"latitude": 22.1956, "longitude": 92.2247},
+          "rating": 3.8,
+          "description": "Hotel with mountain views."
+        },
+        {
+          "hotelName": "Venus Resort",
+          "hotelAddress": "Bandarban",
+          "price": "4000-8000 BDT",
+          "hotelImageUrl": "placeholder_venus.jpg",
+          "geoCoordinates": {"latitude": 22.1856, "longitude": 92.2147},
+          "rating": 4.0,
+          "description": "Resort with comfortable accommodations."
+        }
+      ]
+    },
+      {
+      "placeName": "Paharpur Buddhist Vihara",
+      "geoCoordinates": {"latitude": 25.0260, "longitude": 89.0087},
+      "description": "A UNESCO World Heritage Site, one of the most important archaeological sites in Bangladesh.",
+      "imageUrl": "placeholder_paharpur.jpg",
+      "placeDetails": "Remains of an ancient Buddhist monastery.",
+      "placeImageUrl": "placeholder_paharpur_details.jpg",
+      "ticketPricing": "20 BDT (Bangladeshi citizens), 200 BDT (foreigners).",
+      "timeToTravel": "October to March (pleasant weather).",
+      "hotels": [
+        {
+          "hotelName": "Hotel Momtaz",
+          "hotelAddress": "Naogaon (nearest city)",
+          "price": "2000-4000 BDT",
+          "hotelImageUrl": "placeholder_hotelmomtaz.jpg",
+          "geoCoordinates": {"latitude": 24.8195, "longitude": 88.9302},
+          "rating": 3.0,
+          "description": "Basic hotel in nearby Naogaon."
+        },
+        {
+          "hotelName": "There are limited options. Consider staying in Bogura.",
+          "hotelAddress": "Bogura (further away)",
+          "price": "Varies in Bogura",
+          "hotelImageUrl": "placeholder_bogurahotel.jpg",
+          "geoCoordinates": {"latitude": 24.8500, "longitude": 89.3700},
+          "rating": "Varies",
+          "description": "Bogura has better hotel options; plan for a day trip."
+        }
+      ]
+    },
+    {
+      "placeName": "Mainamati",
+      "geoCoordinates": {"latitude": 23.4215, "longitude": 91.1627},
+      "description": "An ancient Buddhist archaeological site near Comilla.",
+      "imageUrl": "placeholder_mainamati.jpg",
+      "placeDetails": "Shalban Vihara, Kotila Mura, Charpatra Mura.",
+      "placeImageUrl": "placeholder_mainamati_details.jpg",
+      "ticketPricing": "20 BDT (Bangladeshi citizens), 200 BDT (foreigners).",
+      "timeToTravel": "October to March (pleasant weather).",
+      "hotels": [
+        {
+          "hotelName": "Comilla Club Limited",
+          "hotelAddress": "Comilla (near Mainamati)",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_comillaclub.jpg",
+          "geoCoordinates": {"latitude": 23.4672, "longitude": 91.1843},
+          "rating": 3.5,
+          "description": "A club with lodging facilities."
+        },
+        {
+          "hotelName": "Hotel Nurjahan",
+          "hotelAddress": "Comilla",
+          "price": "2500-5000 BDT",
+          "hotelImageUrl": "placeholder_hotelnurjahan.jpg",
+          "geoCoordinates": {"latitude": 23.4640, "longitude": 91.1920},
+          "rating": 3.2,
+          "description": "Simple hotel in Comilla."
+        }
+      ]
+    },
+        {
+      "placeName": "Bagerhat",
+      "geoCoordinates": {"latitude": 22.6667, "longitude": 89.7833},
+      "description": "A historical city with numerous mosques, including the Sixty Dome Mosque, a UNESCO World Heritage Site.",
+      "imageUrl": "placeholder_bagerhat.jpg",
+      "placeDetails": "Sixty Dome Mosque (Shat Gombuj Mosque), Shrine of Khan Jahan Ali, Singair Mosque.",
+      "placeImageUrl": "placeholder_bagerhat_details.jpg",
+      "ticketPricing": "Mosque entry fees (small donations are customary).",
+      "timeToTravel": "October to March (pleasant weather).",
+      "hotels": [
+        {
+          "hotelName": "Hotel Avijat",
+          "hotelAddress": "Bagerhat",
+          "price": "2500-5000 BDT",
+          "hotelImageUrl": "placeholder_hotelavijat.jpg",
+          "geoCoordinates": {"latitude": 22.6767, "longitude": 89.7933},
+          "rating": 3.3,
+          "description": "Basic hotel in Bagerhat."
+        },
+        {
+          "hotelName": "Hotel Sundarban",
+          "hotelAddress": "Bagerhat",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_hotelsundarbanbagerhat.jpg",
+          "geoCoordinates": {"latitude": 22.6567, "longitude": 89.7733},
+          "rating": 3.6,
+          "description": "A locally regarded option."
+        }
+      ]
+    },
+    {
+      "placeName": "Kuakata",
+      "geoCoordinates": {"latitude": 21.8124, "longitude": 90.1393},
+      "description": "A beach famous for its panoramic sea views and the rare opportunity to witness both sunrise and sunset.",
+      "imageUrl": "placeholder_kuakata.jpg",
+      "placeDetails": "Kuakata Beach, Buddhist Temple, Misripara Buddhist Temple, Gangamati Reserve Forest.",
+      "placeImageUrl": "placeholder_kuakata_details.jpg",
+      "ticketPricing": "Free access to the beach.",
+      "timeToTravel": "October to March (dry season).",
+      "hotels": [
+        {
+          "hotelName": "Hotel Graver Inn International",
+          "hotelAddress": "Kuakata",
+          "price": "4000-8000 BDT",
+          "hotelImageUrl": "placeholder_graverinn.jpg",
+          "geoCoordinates": {"latitude": 21.8224, "longitude": 90.1493},
+          "rating": 4.0,
+          "description": "Modern hotel near the beach."
+        },
+        {
+          "hotelName": "Hotel Banani Palace",
+          "hotelAddress": "Kuakata",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_bananipalace.jpg",
+          "geoCoordinates": {"latitude": 21.8024, "longitude": 90.1293},
+          "rating": 3.5,
+          "description": "A decent choice."
+        }
+      ]
+    },
+
+    {
+      "placeName": "Sitakunda",
+      "geoCoordinates": {"latitude": 22.5232, "longitude": 91.7093},
+      "description": "Known for its Chandranath Temple, Eco Park, and scenic hills.",
+      "imageUrl": "placeholder_sitakunda.jpg",
+      "placeDetails": "Chandranath Temple, Eco Park, Botanical Garden, Labanakhya Sea Beach.",
+      "placeImageUrl": "placeholder_sitakunda_details.jpg",
+      "ticketPricing": "Park entry fees (approx. 50-100 BDT).",
+      "timeToTravel": "October to March (pleasant weather).",
+      "hotels": [
+        {
+          "hotelName": "Hotel Golden Inn",
+          "hotelAddress": "Near Sitakunda",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_goldeninn.jpg",
+          "geoCoordinates": {"latitude": 22.4708, "longitude": 91.7701},
+          "rating": 3.5,
+          "description": "Simple but clean."
+        },
+        {
+          "hotelName": "Hotel Asian SR",
+          "hotelAddress": "Dhaka-Chittagong Hwy, Sitakunda",
+          "price": "2500-5000 BDT",
+          "hotelImageUrl": "placeholder_asiansr.jpg",
+          "geoCoordinates": {"latitude": 22.5282, "longitude": 91.7143},
+          "rating": 3.2,
+          "description": "Conveniently located option."
+        }
+      ]
+    },
+      {
+      "placeName": "Madhabkunda Waterfall",
+      "geoCoordinates": {"latitude": 24.7500, "longitude": 92.1167},
+      "description": "One of the largest waterfalls in Bangladesh, surrounded by lush greenery.",
+      "imageUrl": "placeholder_madhabkunda.jpg",
+      "placeDetails": "Waterfall, tea gardens, surrounding forest.",
+      "placeImageUrl": "placeholder_madhabkunda_details.jpg",
+      "ticketPricing": "Entry fee (approx. 20-50 BDT).",
+      "timeToTravel": "October to March (avoid monsoon season).",
+      "hotels": [
+        {
+          "hotelName": "Hotel Supreme",
+          "hotelAddress": "Moulovibazar (nearest city)",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_hotelsupreme.jpg",
+          "geoCoordinates": {"latitude": 24.4833, "longitude": 91.7833},
+          "rating": 3.7,
+          "description": "Hotel in Moulvibazar, about an hour away."
+        },
+        {
+          "hotelName": "Grand Sylhet (Requires travel)",
+          "hotelAddress": "Sylhet (requires travel)",
+          "price": "7000-14000 BDT",
+          "hotelImageUrl": "placeholder_grandsylhet_again.jpg",
+          "geoCoordinates": {"latitude": 24.9049, "longitude": 91.8587},
+          "rating": 4.3,
+          "description": "Luxurious. Requires significant travel to waterfall."
+        }
+      ]
+    },
+
+    {
+      "placeName": "Nilachal",
+      "geoCoordinates": {"latitude": 22.1937, "longitude": 92.2175},
+      "description": "A popular tourist spot in Bandarban, offering panoramic views of the surrounding hills.",
+      "imageUrl": "placeholder_nilachal.jpg",
+      "placeDetails": "Scenic viewpoints, cloud watching.",
+      "placeImageUrl": "placeholder_nilachal_details.jpg",
+      "ticketPricing": "Entry fee (approx. 50-100 BDT).",
+      "timeToTravel": "October to March (best views).",
+      "hotels": [
+        {
+          "hotelName": "Hill View (Bandarban - near Nilachal)",
+          "hotelAddress": "Bandarban",
+          "price": "3000-6000 BDT",
+          "hotelImageUrl": "placeholder_hillview_again.jpg",
+          "geoCoordinates": {"latitude": 22.1956, "longitude": 92.2247},
+          "rating": 3.8,
+          "description": "Hotel with mountain views, in Bandarban."
+        },
+        {
+          "hotelName": "Venus Resort (Bandarban - near Nilachal)",
+          "hotelAddress": "Bandarban",
+          "price": "4000-8000 BDT",
+          "hotelImageUrl": "placeholder_venus_again.jpg",
+          "geoCoordinates": {"latitude": 22.1856, "longitude": 92.2147},
+          "rating": 4.0,
+          "description": "Another strong option in Bandarban."
+        }
+      ]
+    },
+    {
+      "placeName": "Inani Beach",
+      "geoCoordinates": {"latitude": 21.3696, "longitude": 92.0217},
+      "description": "A quiet beach near Cox's Bazar, known for its coral boulders and calm waters.",
+      "imageUrl": "placeholder_inanibeach.jpg",
+      "placeDetails": "Coral boulders, serene beach.",
+      "placeImageUrl": "placeholder_inanibeach_details.jpg",
+      "ticketPricing": "Free access to the beach.",
+      "timeToTravel": "October to March (pleasant weather).",
+      "hotels": [
+        {
+          "hotelName": "Royal Tulip Sea Pearl Beach Resort",
+          "hotelAddress": "Near Inani, Cox's Bazar",
+          "price": "10000-25000 BDT",
+          "hotelImageUrl": "placeholder_royaltulip.jpg",
+          "geoCoordinates": {"latitude": 21.3596, "longitude": 92.0117},
+          "rating": 4.6,
+          "description": "Luxury resort with excellent amenities."
+        },
+        {
+          "hotelName": "Ocean Paradise Hotel & Resort (Further away)",
+          "hotelAddress": "Cox's Bazar",
+          "price": "6000-15000 BDT",
+          "hotelImageUrl": "placeholder_oceanparadise.jpg",
+          "geoCoordinates": {"latitude": 21.4343, "longitude": 92.0011},
+          "rating": 4.2,
+          "description": "Good choice, but further away.  Needs a drive to Inani."
+        }
+      ]
+    }
+  ]
+}
