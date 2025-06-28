@@ -111,63 +111,7 @@ const upload = multer({ storage });
     const touristSpots = require('./Json/list.json').touristSpots;
 
  
-    app.post('/api/chatbot', (req, res) => {
-        const userQuery = req.body.query.toLowerCase();
-      
-        let response = { success: false, message: 'No matching information found.' };
-      
-        // Check for place details
-        if (userQuery.includes('tell me about') || userQuery.includes('describe')) {
-          const placeName = userQuery.replace('tell me about', '').replace('describe', '').trim();
-          const place = touristSpots.find(spot => spot.placeName.toLowerCase().includes(placeName));
-          if (place) {
-            response = { success: true, data: place };
-          }
-        }
-      
-        // Check for hotels
-        else if (userQuery.includes('hotels') || userQuery.includes('stay')) {
-          const placeName = userQuery.replace('hotels', '').replace('stay', '').trim();
-          const place = touristSpots.find(spot => spot.placeName.toLowerCase().includes(placeName));
-          if (place) {
-            response = { success: true, data: place.hotels };
-          }
-        }
-      
-        // Check for ticket pricing
-        else if (userQuery.includes('cost') || userQuery.includes('ticket')) {
-          const placeName = userQuery.replace('cost', '').replace('ticket', '').trim();
-          const place = touristSpots.find(spot => spot.placeName.toLowerCase().includes(placeName));
-          if (place) {
-            response = { success: true, data: { ticketPricing: place.ticketPricing } };
-          }
-        }
-      
-        // Check for best time to visit
-        else if (userQuery.includes('best time') || userQuery.includes('when to visit')) {
-          const placeName = userQuery.replace('best time', '').replace('when to visit', '').trim();
-          const place = touristSpots.find(spot => spot.placeName.toLowerCase().includes(placeName));
-          if (place) {
-            response = { success: true, data: { timeToTravel: place.timeToTravel } };
-          }
-        }
-      
-        // Default search
-        else {
-          const results = touristSpots.filter(spot => 
-            spot.placeName.toLowerCase().includes(userQuery) || 
-            spot.description.toLowerCase().includes(userQuery) ||
-            spot.placeDetails.toLowerCase().includes(userQuery)
-          );
-          if (results.length > 0) {
-            response = { success: true, data: results };
-          }
-        }
-      
-        res.json(response);
-      });
-
-
+    
 
 
 
@@ -307,21 +251,7 @@ const upload = multer({ storage });
             res.status(500).json({ message: "Error deleting plan", error });
         }
     });
-    
-    
 
-
-
-
-    
-    
-    
-    
-
-  
-
-
-   
 
     TouristSpotModel.init()
     .then(() => console.log("Mongoose model synced with database"))
@@ -338,6 +268,132 @@ const upload = multer({ storage });
           res.status(500).json({ error: err.message });
         }
       });
+
+
+
+    
+
+ 
+    
+
+
+    // Helper functions for the chatbot
+const findPlaceByName = (placeName, touristSpots) => {
+  return touristSpots.find(spot => 
+    spot.placeName.toLowerCase().includes(placeName.toLowerCase())
+  );
+};
+
+const findHotelsByPriceRange = (minPrice, maxPrice, touristSpots) => {
+  const hotels = [];
+  touristSpots.forEach(spot => {
+    spot.hotels.forEach(hotel => {
+      const priceRange = hotel.price.split('-');
+      const minHotelPrice = parseInt(priceRange[0].replace(/[^0-9]/g, ''));
+      const maxHotelPrice = parseInt(priceRange[1].replace(/[^0-9]/g, ''));
+      
+      if (minHotelPrice >= minPrice && maxHotelPrice <= maxPrice) {
+        hotels.push({
+          ...hotel,
+          location: spot.placeName
+        });
+      }
+    });
+  });
+  return hotels;
+};
+
+const findPlacesByTimeToTravel = (month, touristSpots) => {
+  return touristSpots.filter(spot => {
+    const timeToTravel = spot.timeToTravel.toLowerCase();
+    return timeToTravel.includes(month.toLowerCase());
+  });
+};
+
+// Chatbot endpoint
+app.post('/api/chatbot', async (req, res) => {
+  try {
+    const { message } = req.body;
+    const lowerMessage = message.toLowerCase();
+    
+    // Process the user's message
+    let response = '';
+    
+    // Place information
+    if (lowerMessage.includes('tell me about') || lowerMessage.includes('what is')) {
+      const placeName = message.replace(/tell me about|what is/gi, '').trim();
+      const place = findPlaceByName(placeName, touristSpots);
+      
+      if (place) {
+        response = `${place.placeName}: ${place.description}\n
+Best time to visit: ${place.timeToTravel}\n
+Ticket pricing: ${place.ticketPricing}\n
+Key attractions: ${place.placeDetails}`;
+      } else {
+        response = "I couldn't find information about that place. Please try another location.";
+      }
+    }
+    
+    // Hotel recommendations
+    else if (lowerMessage.includes('hotel') || lowerMessage.includes('where to stay')) {
+      if (lowerMessage.includes('budget') || lowerMessage.includes('cheap')) {
+        const hotels = findHotelsByPriceRange(0, 5000, touristSpots);
+        response = "Here are some budget-friendly hotels:\n" + 
+          hotels.slice(0, 3).map(hotel => 
+            `${hotel.hotelName} in ${hotel.location}: ${hotel.price} - ${hotel.description}`
+          ).join('\n');
+      } else if (lowerMessage.includes('luxury')) {
+        const hotels = findHotelsByPriceRange(10000, 50000, touristSpots);
+        response = "Here are some luxury hotels:\n" + 
+          hotels.slice(0, 3).map(hotel => 
+            `${hotel.hotelName} in ${hotel.location}: ${hotel.price} - ${hotel.description}`
+          ).join('\n');
+      }
+    }
+    
+    // Best time to visit
+    else if (lowerMessage.includes('when') || lowerMessage.includes('best time')) {
+      if (lowerMessage.includes('october')) {
+        const places = findPlacesByTimeToTravel('october', touristSpots);
+        response = "Places ideal to visit in October:\n" + 
+          places.map(place => `${place.placeName}: ${place.timeToTravel}`).join('\n');
+      }
+      // Add more month-specific responses as needed
+    }
+    
+    // Default response
+    else {
+      response = `I can help you with:
+1. Information about tourist spots (try "Tell me about Cox's Bazar")
+2. Hotel recommendations (try "luxury hotels" or "budget hotels")
+3. Best time to visit (try "When to visit Sundarbans")
+What would you like to know?`;
+    }
+    
+    res.json({ response });
+  } catch (error) {
+    res.status(500).json({ error: 'Error processing chat message' });
+  }
+});
+
+
+
+    
+
+
+
+
+    
+    
+    
+    
+
+  
+
+
+   
+
+   
 
 
 
