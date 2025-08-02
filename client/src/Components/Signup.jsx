@@ -11,22 +11,25 @@ export const SignUp = () => {
     const navigate = useNavigate();
 
     const handleSignUp = (e) => {
-        e.preventDefault();
-        axios.post("http://localhost:3001/signup", { name, email, password })
-            .then(result => {
-                if (result.data.message === "Success") {
-                    localStorage.setItem("authToken", "user-token-example");
-                    localStorage.setItem("userId", result.data.user._id);
-                    navigate("/home");
-                } else {
-                    alert("Signup failed. Please check your details.");
-                }
-            })
-            .catch(error => {
-                console.error("Error signing up:", error);
+    e.preventDefault();
+    axios.post("http://localhost:3001/signup", { name, email, password })
+        .then(result => {
+            // Check for successful status code instead
+            if (result.status === 201) {
+                localStorage.setItem("authToken", "user-token-example");
+                localStorage.setItem("userId", result.data._id);
+                navigate("/home");
+            }
+        })
+        .catch(error => {
+            console.error("Error signing up:", error);
+            if (error.response && error.response.data.error) {
+                alert(error.response.data.error);
+            } else {
                 alert("An error occurred. Please try again.");
-            });
-    };
+            }
+        });
+};
 
     return (
         <Box
