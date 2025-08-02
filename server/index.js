@@ -9,6 +9,14 @@ const MongoStore = require("connect-mongo");
 const UserModel = require("./Model/User");
 const TouristSpotModel = require("./Model/TouristSpot");
 const TravelPlan = require("./Model/TripPlanModel");
+const PowerProduct=require("./Model/PowerProduct");
+const SleepProduct = require('./Model/SleepProduct'); 
+const BagProduct = require('./Model/BagProduct'); 
+const RainProduct = require('./Model/RainProduct');
+const SecurityProduct = require('./Model/SecurityProduct'); 
+
+
+
 const {
     GoogleGenerativeAI,
     HarmCategory,
@@ -273,7 +281,73 @@ const upload = multer({ storage });
 
     
 
- 
+ // Backend route to get power products
+app.get("/api/products/power", async (req, res) => {
+  console.log("GET /api/products/power requested");
+  try {
+    const powerProducts = await PowerProduct.find();
+    console.log(`Found ${powerProducts.length} products`);
+    res.status(200).json(powerProducts);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/products/sleep", async (req, res) => {
+  console.log("GET /api/products/sleep requested");
+  try {
+    const sleepProducts = await SleepProduct.find();
+    console.log(`Found ${sleepProducts.length} sleep products`);
+    res.status(200).json(sleepProducts);
+  } catch (error) {
+    console.error("Error fetching sleep products:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Security Products Endpoint
+app.get("/api/products/security", async (req, res) => {
+  console.log("GET /api/products/security requested");
+  try {
+   
+    const securityProducts = await SecurityProduct.find();
+    console.log(`Found ${securityProducts.length} security products`);
+    res.status(200).json(securityProducts);
+  } catch (error) {
+    console.error("Error fetching security products:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Bags Products Endpoint
+app.get("/api/products/bags", async (req, res) => {
+  console.log("GET /api/products/bags requested");
+  try {
+   
+    const bagProducts = await BagProduct.find();
+    console.log(`Found ${bagProducts.length} bag products`);
+    res.status(200).json(bagProducts);
+  } catch (error) {
+    console.error("Error fetching bag products:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Rain Protection Products Endpoint
+app.get("/api/products/rain", async (req, res) => {
+  console.log("GET /api/products/rain requested");
+  try {
+  
+    const rainProducts = await RainProduct.find();
+    console.log(`Found ${rainProducts.length} rain products`);
+    res.status(200).json(rainProducts);
+  } catch (error) {
+    console.error("Error fetching rain products:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
     
 
 

@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { 
   Box, Button, Container, Grid, Typography, 
-  Card, CardContent, CardMedia, Fab
+  Card, CardContent, CardMedia, Fab, CircularProgress
 } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
@@ -19,7 +19,15 @@ export const Shop = () => {
   const [activeCategory, setActiveCategory] = useState('power');
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Temporarily fix body overflow issue
+  // State for products
+  const [powerProducts, setPowerProducts] = useState([]);
+  const [sleepProducts, setSleepProducts] = useState([]);
+  const [powerLoading, setPowerLoading] = useState(true);
+  const [sleepLoading, setSleepLoading] = useState(true);
+  const [powerError, setPowerError] = useState(null);
+  const [sleepError, setSleepError] = useState(null);
+
+  // Fix body overflow issue on mount
   useEffect(() => {
     // Store original body styles
     const originalOverflow = document.body.style.overflow;
@@ -37,7 +45,7 @@ export const Shop = () => {
     };
   }, []);
 
-  // Simple scroll handler
+  // Scroll handler
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
@@ -47,7 +55,61 @@ export const Shop = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Simple scroll to section function
+  // Fetch power products on component mount
+  useEffect(() => {
+    const fetchPowerProducts = async () => {
+      try {
+        // Use full URL in development
+        const baseUrl = process.env.NODE_ENV === 'development' 
+          ? 'http://localhost:3001' 
+          : '';
+        
+        const response = await fetch(`${baseUrl}/api/products/power`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch power products');
+        }
+        
+        const data = await response.json();
+        setPowerProducts(data);
+      } catch (err) {
+        setPowerError(err.message);
+      } finally {
+        setPowerLoading(false);
+      }
+    };
+    
+    fetchPowerProducts();
+  }, []);
+
+  // Fetch sleep products on component mount
+  useEffect(() => {
+    const fetchSleepProducts = async () => {
+      try {
+        // Use full URL in development
+        const baseUrl = process.env.NODE_ENV === 'development' 
+          ? 'http://localhost:3001' 
+          : '';
+        
+        const response = await fetch(`${baseUrl}/api/products/sleep`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch sleep products');
+        }
+        
+        const data = await response.json();
+        setSleepProducts(data);
+      } catch (err) {
+        setSleepError(err.message);
+      } finally {
+        setSleepLoading(false);
+      }
+    };
+    
+    fetchSleepProducts();
+  }, []);
+
+  // Scroll to section function
   const scrollToSection = (category) => {
     setActiveCategory(category);
     const element = sectionRefs[category].current;
@@ -71,20 +133,8 @@ export const Shop = () => {
     });
   };
 
-  // Sample product data
-  const products = {
-    power: [
-      { id: 1, name: "Solar Power Bank", price: "$29.99", image: "https://via.placeholder.com/300?text=Solar+Charger" },
-      { id: 2, name: "Universal Travel Adapter", price: "$19.99", image: "https://via.placeholder.com/300?text=Adapter" },
-      { id: 3, name: "Portable Charger 20,000mAh", price: "$39.99", image: "https://via.placeholder.com/300?text=Power+Bank" },
-      { id: 4, name: "Car Phone Mount Charger", price: "$24.99", image: "https://via.placeholder.com/300?text=Car+Charger" },
-    ],
-    sleep: [
-      { id: 5, name: "Memory Foam Travel Pillow", price: "$24.99", image: "https://via.placeholder.com/300?text=Travel+Pillow" },
-      { id: 6, name: "Eye Mask & Earplugs Set", price: "$12.99", image: "https://via.placeholder.com/300?text=Sleep+Set" },
-      { id: 7, name: "Compact Travel Blanket", price: "$29.99", image: "https://via.placeholder.com/300?text=Travel+Blanket" },
-      { id: 8, name: "Neck Support Pillow", price: "$19.99", image: "https://via.placeholder.com/300?text=Neck+Pillow" },
-    ],
+  // Static product data for other categories
+  const staticProducts = {
     security: [
       { id: 9, name: "RFID Blocking Wallet", price: "$22.99", image: "https://via.placeholder.com/300?text=RFID+Wallet" },
       { id: 10, name: "Travel Lock Set", price: "$15.99", image: "https://via.placeholder.com/300?text=Travel+Locks" },
@@ -104,24 +154,6 @@ export const Shop = () => {
       { id: 20, name: "Dry Bag 20L", price: "$29.99", image: "https://via.placeholder.com/300?text=Dry+Bag" },
     ]
   };
-
-  // Temporarily fix body overflow issue
-  useEffect(() => {
-    // Store original body styles
-    const originalOverflow = document.body.style.overflow;
-    const originalHeight = document.body.style.height;
-    
-    // Apply scrollable styles
-    document.body.style.overflow = 'auto';
-    document.body.style.height = 'auto';
-    document.body.style.minHeight = '100vh';
-    
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      document.body.style.height = originalHeight;
-    };
-  }, []);
 
   return (
     <div style={{ paddingTop: '64px', minHeight: '100vh' }}>
@@ -209,13 +241,32 @@ export const Shop = () => {
           >
             Power Accessories
           </Typography>
-          <Grid container spacing={4}>
-            {products.power.map((product) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                <ProductCard product={product} />
-              </Grid>
-            ))}
-          </Grid>
+
+          {powerLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : powerError ? (
+            <Typography color="error" sx={{ textAlign: 'center', py: 4 }}>
+              Error loading power products: {powerError}
+            </Typography>
+          ) : (
+            <Grid container spacing={4}>
+              {powerProducts.map((product) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+                  <ProductCard 
+                    product={{
+                      id: product.id,
+                      name: product.product_name,
+                      price: `$${product.price}`,
+                      image: product.img_url,
+                      description: product.description
+                    }} 
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Box>
 
         {/* Sleep & Comfort Section */}
@@ -236,13 +287,32 @@ export const Shop = () => {
           >
             Sleep & Comfort
           </Typography>
-          <Grid container spacing={4}>
-            {products.sleep.map((product) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                <ProductCard product={product} />
-              </Grid>
-            ))}
-          </Grid>
+          
+          {sleepLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : sleepError ? (
+            <Typography color="error" sx={{ textAlign: 'center', py: 4 }}>
+              Error loading sleep products: {sleepError}
+            </Typography>
+          ) : (
+            <Grid container spacing={4}>
+              {sleepProducts.map((product) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+                  <ProductCard 
+                    product={{
+                      id: product.id,
+                      name: product.product_name,
+                      price: `$${product.price}`,
+                      image: product.img_url,
+                      description: product.description
+                    }} 
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Box>
 
         {/* Security Section */}
@@ -264,7 +334,7 @@ export const Shop = () => {
             Travel Security
           </Typography>
           <Grid container spacing={4}>
-            {products.security.map((product) => (
+            {staticProducts.security.map((product) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
                 <ProductCard product={product} />
               </Grid>
@@ -291,7 +361,7 @@ export const Shop = () => {
             Bags & Luggage
           </Typography>
           <Grid container spacing={4}>
-            {products.bags.map((product) => (
+            {staticProducts.bags.map((product) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
                 <ProductCard product={product} />
               </Grid>
@@ -318,7 +388,7 @@ export const Shop = () => {
             Rain Protection
           </Typography>
           <Grid container spacing={4}>
-            {products.rain.map((product) => (
+            {staticProducts.rain.map((product) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
                 <ProductCard product={product} />
               </Grid>
@@ -347,7 +417,7 @@ export const Shop = () => {
   );
 };
 
-// Product card component
+// Product Card Component
 const ProductCard = ({ product }) => (
   <Card sx={{ 
     height: '100%', 
@@ -371,6 +441,11 @@ const ProductCard = ({ product }) => (
       <Typography gutterBottom variant="h6" component="h3" sx={{ fontWeight: 'bold' }}>
         {product.name}
       </Typography>
+      {product.description && (
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          {product.description}
+        </Typography>
+      )}
       <Typography variant="h5" color="primary" sx={{ fontWeight: 'bold', mt: 1 }}>
         {product.price}
       </Typography>
