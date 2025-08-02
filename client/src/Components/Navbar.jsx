@@ -21,6 +21,7 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+     setIsSidebarOpen(false);
     navigate("/login");
   };
 
@@ -146,11 +147,11 @@ export const Navbar = () => {
             <ListItemText primary="Your Trip" sx={{ color: '#fff' }} />
           </ListItem>
           
-          <ListItem button component={Link} to="/api/chatbot" onClick={toggleSidebar}>
+          <ListItem button component={Link} to="/shop" onClick={toggleSidebar}>
             <ListItemIcon sx={{ color: '#fff' }}>
               <HomeIcon />
             </ListItemIcon>
-            <ListItemText primary="Chatbot" sx={{ color: '#fff' }} />
+            <ListItemText primary="Shop" sx={{ color: '#fff' }} />
           </ListItem>
 
         </List>
