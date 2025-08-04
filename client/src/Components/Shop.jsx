@@ -1,11 +1,17 @@
 import React, { useRef, useState, useEffect } from "react";
 import { 
   Box, Button, Container, Grid, Typography, 
-  Card, CardContent, CardMedia, Fab, CircularProgress
+  Card, CardContent, CardMedia, Fab, CircularProgress,
+  Snackbar, Alert
 } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import Badge from '@mui/material/Badge';
+import { useNavigate } from 'react-router-dom';
 
 export const Shop = () => {
+  const navigate = useNavigate();
+
   // Refs for each section
   const sectionRefs = {
     power: useRef(null),
@@ -35,24 +41,60 @@ export const Shop = () => {
   const [securityError, setSecurityError] = useState(null);
   const [rainError, setRainError] = useState(null);
   const [bagError, setBagError] = useState(null);
+  
+  // Cart state
+  const [cartItems, setCartItems] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
+  const [showCart, setShowCart] = useState(false);
+  
+  // Notification state
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
   // Fix body overflow issue on mount
   useEffect(() => {
-    // Store original body styles
     const originalOverflow = document.body.style.overflow;
     const originalHeight = document.body.style.height;
     
-    // Apply scrollable styles
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
     document.body.style.minHeight = '100vh';
     
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = originalOverflow;
       document.body.style.height = originalHeight;
     };
   }, []);
+
+  // Load cart count on component mount
+  useEffect(() => {
+    loadCartCount();
+  }, []);
+
+  // Load cart count from backend
+  const loadCartCount = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+
+      const baseUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3001' 
+        : '';
+      
+      const response = await fetch(`${baseUrl}/api/cart/${userId}`);
+      
+      if (response.ok) {
+        const cartData = await response.json();
+        setCartCount(cartData.totalItems);
+        setShowCart(cartData.totalItems > 0);
+      }
+    } catch (error) {
+      console.error('Error loading cart count:', error);
+    }
+  };
 
   // Scroll handler
   useEffect(() => {
@@ -68,7 +110,6 @@ export const Shop = () => {
   useEffect(() => {
     const fetchPowerProducts = async () => {
       try {
-        // Use full URL in development
         const baseUrl = process.env.NODE_ENV === 'development' 
           ? 'http://localhost:3001' 
           : '';
@@ -95,7 +136,6 @@ export const Shop = () => {
   useEffect(() => {
     const fetchSleepProducts = async () => {
       try {
-        // Use full URL in development
         const baseUrl = process.env.NODE_ENV === 'development' 
           ? 'http://localhost:3001' 
           : '';
@@ -201,7 +241,7 @@ export const Shop = () => {
     setActiveCategory(category);
     const element = sectionRefs[category].current;
     if (element) {
-      const headerOffset = 130; // Account for navbar + sticky nav
+      const headerOffset = 130;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -220,26 +260,70 @@ export const Shop = () => {
     });
   };
 
-  // Static product data for other categories
-  const staticProducts = {
-    security: [
-      { id: 9, name: "RFID Blocking Wallet", price: "$22.99", image: "https://via.placeholder.com/300?text=RFID+Wallet" },
-      { id: 10, name: "Travel Lock Set", price: "$15.99", image: "https://via.placeholder.com/300?text=Travel+Locks" },
-      { id: 11, name: "Anti-Theft Backpack", price: "$79.99", image: "https://via.placeholder.com/300?text=Anti-Theft+Bag" },
-      { id: 12, name: "Portable Door Alarm", price: "$14.99", image: "https://via.placeholder.com/300?text=Door+Alarm" },
-    ],
-    bags: [
-      { id: 13, name: "Waterproof Backpack", price: "$49.99", image: "https://via.placeholder.com/300?text=Waterproof+Bag" },
-      { id: 14, name: "Packable Daypack", price: "$34.99", image: "https://via.placeholder.com/300?text=Daypack" },
-      { id: 15, name: "Rolling Suitcase", price: "$129.99", image: "https://via.placeholder.com/300?text=Suitcase" },
-      { id: 16, name: "Travel Toiletry Bag", price: "$24.99", image: "https://via.placeholder.com/300?text=Toiletry+Bag" },
-    ],
-    rain: [
-      { id: 17, name: "Compact Travel Umbrella", price: "$18.99", image: "https://via.placeholder.com/300?text=Travel+Umbrella" },
-      { id: 18, name: "Waterproof Jacket", price: "$59.99", image: "https://via.placeholder.com/300?text=Rain+Jacket" },
-      { id: 19, name: "Waterproof Shoe Covers", price: "$14.99", image: "https://via.placeholder.com/300?text=Shoe+Covers" },
-      { id: 20, name: "Dry Bag 20L", price: "$29.99", image: "https://via.placeholder.com/300?text=Dry+Bag" },
-    ]
+  // Add to cart function
+  const handleAddToCart = async (product) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      
+      if (!userId) {
+        setSnackbar({
+          open: true,
+          message: 'Please login to add items to cart',
+          severity: 'warning'
+        });
+        return;
+      }
+
+      const baseUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3001' 
+        : '';
+
+      const response = await fetch(`${baseUrl}/api/cart/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          product
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Update cart count
+        setCartCount(prevCount => prevCount + 1);
+        setShowCart(true);
+        
+        // Show success message
+        setSnackbar({
+          open: true,
+          message: `${product.name} added to cart!`,
+          severity: 'success'
+        });
+        
+        // Reload cart count to get accurate count
+        loadCartCount();
+      } else {
+        throw new Error('Failed to add item to cart');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to add item to cart',
+        severity: 'error'
+      });
+    }
+  };
+
+  // Close snackbar
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -308,6 +392,36 @@ export const Shop = () => {
         </Container>
       </Box>
 
+      {/* Cart FAB */}
+      {showCart && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: '100px',
+            right: '20px',
+            zIndex: 1100,
+          }}
+        >
+          <Fab
+            color="primary"
+            aria-label="shopping cart"
+            onClick={() => navigate('/cart')}
+            sx={{
+              width: 60,
+              height: 60,
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.1)',
+              },
+            }}
+          >
+            <Badge badgeContent={cartCount} color="error">
+              <ShoppingCartIcon />
+            </Badge>
+          </Fab>
+        </Box>
+      )}
+
       {/* Products Sections */}
       <Container sx={{ py: 6 }}>
         {/* Power Section */}
@@ -349,6 +463,7 @@ export const Shop = () => {
                       image: product.img_url,
                       description: product.description
                     }} 
+                    onAddToCart={handleAddToCart}
                   />
                 </Grid>
               ))}
@@ -395,6 +510,7 @@ export const Shop = () => {
                       image: product.img_url,
                       description: product.description
                     }} 
+                    onAddToCart={handleAddToCart}
                   />
                 </Grid>
               ))}
@@ -404,7 +520,20 @@ export const Shop = () => {
 
         {/* Security Section */}
         <Box ref={sectionRefs.security} sx={{ mb: 10 }}>
-          <Typography variant="h3" component="h2" gutterBottom>
+          <Typography 
+            variant="h3" 
+            component="h2" 
+            gutterBottom 
+            sx={{ 
+              fontWeight: 'bold', 
+              color: 'primary.main',
+              mb: 4,
+              borderBottom: '3px solid',
+              borderColor: 'primary.main',
+              pb: 1,
+              display: 'inline-block'
+            }}
+          >
             Travel Security
           </Typography>
           {securityLoading ? (
@@ -427,6 +556,7 @@ export const Shop = () => {
                       image: product.img_url,
                       description: product.description
                     }} 
+                    onAddToCart={handleAddToCart}
                   />
                 </Grid>
               ))}
@@ -472,6 +602,7 @@ export const Shop = () => {
                       image: product.img_url,
                       description: product.description
                     }} 
+                    onAddToCart={handleAddToCart}
                   />
                 </Grid>
               ))}
@@ -481,7 +612,20 @@ export const Shop = () => {
 
         {/* Rain Protection Section */}
         <Box ref={sectionRefs.rain} sx={{ mb: 10 }}>
-          <Typography variant="h3" component="h2" gutterBottom>
+          <Typography 
+            variant="h3" 
+            component="h2" 
+            gutterBottom 
+            sx={{ 
+              fontWeight: 'bold', 
+              color: 'primary.main',
+              mb: 4,
+              borderBottom: '3px solid',
+              borderColor: 'primary.main',
+              pb: 1,
+              display: 'inline-block'
+            }}
+          >
             Rain Protection
           </Typography>
           {rainLoading ? (
@@ -504,6 +648,7 @@ export const Shop = () => {
                       image: product.img_url,
                       description: product.description
                     }} 
+                    onAddToCart={handleAddToCart}
                   />
                 </Grid>
               ))}
@@ -528,12 +673,28 @@ export const Shop = () => {
           <KeyboardArrowUpIcon />
         </Fab>
       )}
+
+      {/* Snackbar for notifications */}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={3000} 
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbar.severity} 
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
 
 // Product Card Component
-const ProductCard = ({ product }) => (
+const ProductCard = ({ product, onAddToCart }) => (
   <Card sx={{ 
     height: '100%', 
     display: 'flex', 
@@ -569,7 +730,13 @@ const ProductCard = ({ product }) => (
       <Button size="small" variant="outlined" color="primary" sx={{ fontWeight: 'bold' }}>
         Details
       </Button>
-      <Button size="small" variant="contained" color="primary" sx={{ fontWeight: 'bold' }}>
+      <Button 
+        size="small" 
+        variant="contained" 
+        color="primary" 
+        sx={{ fontWeight: 'bold' }}
+        onClick={() => onAddToCart(product)}
+      >
         Add to Cart
       </Button>
     </Box>

@@ -12,6 +12,7 @@ import TripIcon from '@mui/icons-material/Flight';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -152,6 +153,13 @@ export const Navbar = () => {
               <HomeIcon />
             </ListItemIcon>
             <ListItemText primary="Shop" sx={{ color: '#fff' }} />
+          </ListItem>
+
+          <ListItem button component={Link} to="/cart" onClick={toggleSidebar}>
+            <ListItemIcon sx={{ color: '#fff' }}>
+              <ShoppingCartIcon />
+            </ListItemIcon>
+            <ListItemText primary="My Cart" sx={{ color: '#fff' }} />
           </ListItem>
 
         </List>

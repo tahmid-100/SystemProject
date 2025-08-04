@@ -9,12 +9,14 @@ import { Navbar } from "./Components/Navbar";
 import { Userprofile } from "./Components/Userprofile";
 import { TravelPlan } from "./Components/TravelPlan"; 
 import { SavedPlan } from "./Components/Savedplan"; 
+import { Cart } from "./Components/Cart";
 
 import {Shop} from "./Components/Shop";
 import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
 
   return (
     <>
@@ -28,8 +30,23 @@ function App() {
             <Route path="/userprofile" element={<ProtectedRoute component={Userprofile} />} />
             <Route path="/travelplan" element={<ProtectedRoute component={TravelPlan} />} />
             <Route path="/savedplan" element={<ProtectedRoute component={SavedPlan} />} />
-            
             <Route path="/shop" element={<ProtectedRoute component={Shop} />} />
+            <Route 
+              path="/cart" 
+              element={
+                <ProtectedRoute 
+                  component={() => (
+                    <Cart 
+                      items={cartItems} 
+                      onRemoveItem={(id) => {
+                        setCartItems(items => items.filter(item => item.id !== id));
+                      }}
+                      onClose={() => navigate(-1)}
+                    />
+                  )} 
+                />
+              } 
+            />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </BrowserRouter>
