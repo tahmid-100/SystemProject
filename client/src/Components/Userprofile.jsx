@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import './Userprofile.css'; // Import the CSS file
+import './Userprofile.css';
 
 export const Userprofile = () => {
     const [userData, setUserData] = useState(null);
@@ -74,94 +74,125 @@ export const Userprofile = () => {
             });
     };
 
+    const getCurrentImageSrc = () => {
+        if (editableData.image && editableData.image instanceof File) {
+            return URL.createObjectURL(editableData.image);
+        } else if (userData?.image) {
+            return `http://localhost:3001/uploads/${userData.image}`;
+        }
+        return null;
+    };
+
     return (
         <div className="user-profile">
-            <h1>User Profile</h1>
-            {userData ? (
-                <div>
-                    <div className="input-group">
-                        <label><strong>Name:</strong></label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={editableData.name}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="input-group">
-                        <label><strong>Email:</strong></label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={editableData.email}
-                            onChange={handleInputChange}
-                            disabled
-                        />
-                    </div>
-                    <div className="input-group">
-                        <label><strong>Phone:</strong></label>
-                        <input
-                            type="text"
-                            name="phonenum"
-                            value={editableData.phonenum}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-                    <div className="input-group">
-                        <label><strong>Address:</strong></label>
-                        <input
-                            type="text"
-                            name="address"
-                            value={editableData.address}
-                            onChange={handleInputChange}
-                        />
-                    </div>
+            <div className="profile-container">
+                <div className="profile-header">
+                    <h1>Profile</h1>
+                    <p className="profile-subtitle">Manage your account information</p>
+                </div>
 
-                    <div className="input-group">
-                        <label><strong>Profile Image:</strong></label>
-                        <input
-                            type="file"
-                            name="image"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
-                    </div>
-
-                    {!editableData.image && !userData.image && (
-                        <p className="no-image-message">Please choose an image...</p>
-                    )}
-
-                    {editableData.image && editableData.image instanceof File ? (
-                        <div className="image-preview">
-                            <h3>Selected Image:</h3>
-                            <img
-                                src={URL.createObjectURL(editableData.image)}
-                                alt="Profile Preview"
-                            />
-                        </div>
-                    ) : (
-                        userData.image && (
-                            <div className="image-preview">
-                                <h3>Current Image:</h3>
+                {userData ? (
+                    <>
+                        <div className="profile-image-section">
+                            <div className="profile-image-container">
                                 <img
-                                    src={`http://localhost:3001/uploads/${userData.image}`}
-                                    alt="Current Profile"
+                                    src={getCurrentImageSrc() || "https://via.placeholder.com/120x120?text=Profile"}
+                                    alt="Profile"
+                                    className="profile-image"
                                     onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = "/path/to/default/image.jpg";
+                                        e.target.src = "https://via.placeholder.com/120x120?text=Profile";
                                     }}
                                 />
+                                <label className="image-upload-label" htmlFor="image-upload">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                </label>
+                                <input
+                                    id="image-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="image-upload-input"
+                                />
                             </div>
-                        )
-                    )}
+                            {!getCurrentImageSrc() && (
+                                <p className="no-image-message">Click the icon to upload a profile picture</p>
+                            )}
+                        </div>
 
-                    <div>
-                        <button onClick={handleUpdate}>Update</button>
+                        <div className="profile-form">
+                            <div className="input-group">
+                                <label htmlFor="name">Full Name</label>
+                                <input
+                                    id="name"
+                                    type="text"
+                                    name="name"
+                                    value={editableData.name}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your full name"
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label htmlFor="email">Email Address</label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={editableData.email}
+                                    onChange={handleInputChange}
+                                    disabled
+                                    placeholder="your.email@example.com"
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label htmlFor="phonenum">Phone Number</label>
+                                <input
+                                    id="phonenum"
+                                    type="tel"
+                                    name="phonenum"
+                                    value={editableData.phonenum}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your phone number"
+                                />
+                            </div>
+
+                            <div className="input-group">
+                                <label htmlFor="address">Address</label>
+                                <input
+                                    id="address"
+                                    type="text"
+                                    name="address"
+                                    value={editableData.address}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter your address"
+                                />
+                            </div>
+
+                            <button className="update-button" onClick={handleUpdate}>
+                                Update Profile
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <div className="loading-message">
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ 
+                                width: '40px', 
+                                height: '40px', 
+                                border: '4px solid #e2e8f0', 
+                                borderTop: '4px solid #667eea', 
+                                borderRadius: '50%', 
+                                animation: 'spin 1s linear infinite',
+                                margin: '0 auto 20px'
+                            }}></div>
+                            Loading your profile...
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <p className="loading-message">Loading profile...</p>
-            )}
+                )}
+            </div>
         </div>
     );
 }
