@@ -147,6 +147,48 @@ export const Cart = () => {
     }
   };
 
+  const handleCheckout = async () => {
+    try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+            setError("Please login to checkout");
+            return;
+        }
+
+        // Show loading state
+        setLoading(true);
+
+        const response = await fetch('http://localhost:3001/api/payment/init', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                totalAmount: (totalPrice + totalPrice * 0.08).toFixed(2),
+                userId,
+                cartItems
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Payment initialization failed');
+        }
+
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            throw new Error('Invalid payment URL');
+        }
+    } catch (error) {
+        console.error('Checkout error:', error);
+        setError(error.message || 'Failed to process checkout. Please try again.');
+    } finally {
+        setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <Container sx={{ py: 8, textAlign: 'center' }}>
@@ -338,6 +380,8 @@ export const Cart = () => {
                 fullWidth
                 size="large"
                 sx={{ mb: 2 }}
+                onClick={handleCheckout}
+                disabled={cartItems.length === 0}
               >
                 Proceed to Checkout
               </Button>

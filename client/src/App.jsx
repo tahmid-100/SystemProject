@@ -10,6 +10,8 @@ import { Userprofile } from "./Components/Userprofile";
 import { TravelPlan } from "./Components/TravelPlan"; 
 import { SavedPlan } from "./Components/Savedplan"; 
 import { Cart } from "./Components/Cart";
+import { PaymentSuccess } from './Components/PaymentSuccess';
+import { PaymentFailed } from './Components/PaymentFailed';
 
 import {Shop} from "./Components/Shop";
 import ProtectedRoute from "./ProtectedRoute";
@@ -47,6 +49,8 @@ function App() {
                 />
               } 
             />
+            <Route path="/payment-success" element={<ProtectedRoute component={PaymentSuccess} />} />
+            <Route path="/payment-failed" element={<ProtectedRoute component={PaymentFailed} />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </BrowserRouter>

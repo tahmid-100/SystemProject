@@ -534,25 +534,29 @@ app.delete("/api/cart/clear/:userId", async (req, res) => {
     }
 });
 
-    
+const paymentRoutes = require('./Routes/paymentRoutes');
 
-
- 
-
-    
-    
-    
-
-  
-
-
-   
-
-   
+// Add this after your existing middleware
+app.use('/api/payment', paymentRoutes);
 
 
 
-      
-    
-    
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
