@@ -22,10 +22,23 @@ export const Shop = () => {
   // State for products
   const [powerProducts, setPowerProducts] = useState([]);
   const [sleepProducts, setSleepProducts] = useState([]);
+  const [securityProducts, setSecurityProducts] = useState([]);
+  const [bagProducts, setBagProducts] = useState([]);
+  const [rainProducts, setRainProducts] = useState([]);
+
+  // Loading states
   const [powerLoading, setPowerLoading] = useState(true);
   const [sleepLoading, setSleepLoading] = useState(true);
+  const [securityLoading, setSecurityLoading] = useState(true);
+  const [bagLoading, setBagLoading] = useState(true);
+  const [rainLoading, setRainLoading] = useState(true);
+
+  // Error states
   const [powerError, setPowerError] = useState(null);
   const [sleepError, setSleepError] = useState(null);
+  const [securityError, setSecurityError] = useState(null);
+  const [bagError, setBagError] = useState(null);
+  const [rainError, setRainError] = useState(null);
 
   // Fix body overflow issue on mount
   useEffect(() => {
@@ -55,58 +68,36 @@ export const Shop = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch power products on component mount
-  useEffect(() => {
-    const fetchPowerProducts = async () => {
-      try {
-        // Use full URL in development
-        const baseUrl = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:3001' 
-          : '';
-        
-        const response = await fetch(`${baseUrl}/api/products/power`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch power products');
-        }
-        
-        const data = await response.json();
-        setPowerProducts(data);
-      } catch (err) {
-        setPowerError(err.message);
-      } finally {
-        setPowerLoading(false);
+  // Generic fetch function
+  const fetchProducts = async (category, setProducts, setLoading, setError) => {
+    try {
+      // Use full URL in development
+      const baseUrl = process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3001' 
+        : '';
+      
+      const response = await fetch(`${baseUrl}/api/products/${category}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ${category} products`);
       }
-    };
-    
-    fetchPowerProducts();
-  }, []);
+      
+      const data = await response.json();
+      setProducts(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Fetch sleep products on component mount
+  // Fetch all products on component mount
   useEffect(() => {
-    const fetchSleepProducts = async () => {
-      try {
-        // Use full URL in development
-        const baseUrl = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:3001' 
-          : '';
-        
-        const response = await fetch(`${baseUrl}/api/products/sleep`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch sleep products');
-        }
-        
-        const data = await response.json();
-        setSleepProducts(data);
-      } catch (err) {
-        setSleepError(err.message);
-      } finally {
-        setSleepLoading(false);
-      }
-    };
-    
-    fetchSleepProducts();
+    fetchProducts('power', setPowerProducts, setPowerLoading, setPowerError);
+    fetchProducts('sleep', setSleepProducts, setSleepLoading, setSleepError);
+    fetchProducts('security', setSecurityProducts, setSecurityLoading, setSecurityError);
+    fetchProducts('bags', setBagProducts, setBagLoading, setBagError);
+    fetchProducts('rain', setRainProducts, setRainLoading, setRainError);
   }, []);
 
   // Scroll to section function
@@ -133,27 +124,59 @@ export const Shop = () => {
     });
   };
 
-  // Static product data for other categories
-  const staticProducts = {
-    security: [
-      { id: 9, name: "RFID Blocking Wallet", price: "$22.99", image: "https://via.placeholder.com/300?text=RFID+Wallet" },
-      { id: 10, name: "Travel Lock Set", price: "$15.99", image: "https://via.placeholder.com/300?text=Travel+Locks" },
-      { id: 11, name: "Anti-Theft Backpack", price: "$79.99", image: "https://via.placeholder.com/300?text=Anti-Theft+Bag" },
-      { id: 12, name: "Portable Door Alarm", price: "$14.99", image: "https://via.placeholder.com/300?text=Door+Alarm" },
-    ],
-    bags: [
-      { id: 13, name: "Waterproof Backpack", price: "$49.99", image: "https://via.placeholder.com/300?text=Waterproof+Bag" },
-      { id: 14, name: "Packable Daypack", price: "$34.99", image: "https://via.placeholder.com/300?text=Daypack" },
-      { id: 15, name: "Rolling Suitcase", price: "$129.99", image: "https://via.placeholder.com/300?text=Suitcase" },
-      { id: 16, name: "Travel Toiletry Bag", price: "$24.99", image: "https://via.placeholder.com/300?text=Toiletry+Bag" },
-    ],
-    rain: [
-      { id: 17, name: "Compact Travel Umbrella", price: "$18.99", image: "https://via.placeholder.com/300?text=Travel+Umbrella" },
-      { id: 18, name: "Waterproof Jacket", price: "$59.99", image: "https://via.placeholder.com/300?text=Rain+Jacket" },
-      { id: 19, name: "Waterproof Shoe Covers", price: "$14.99", image: "https://via.placeholder.com/300?text=Shoe+Covers" },
-      { id: 20, name: "Dry Bag 20L", price: "$29.99", image: "https://via.placeholder.com/300?text=Dry+Bag" },
-    ]
-  };
+  // Generic ProductSection component
+  const ProductSection = ({ 
+    title, 
+    products, 
+    loading, 
+    error, 
+    sectionRef 
+  }) => (
+    <Box ref={sectionRef} sx={{ mb: 10 }}>
+      <Typography 
+        variant="h3" 
+        component="h2" 
+        gutterBottom 
+        sx={{ 
+          fontWeight: 'bold', 
+          color: 'primary.main',
+          mb: 4,
+          borderBottom: '3px solid',
+          borderColor: 'primary.main',
+          pb: 1,
+          display: 'inline-block'
+        }}
+      >
+        {title}
+      </Typography>
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Typography color="error" sx={{ textAlign: 'center', py: 4 }}>
+          Error loading products: {error}
+        </Typography>
+      ) : (
+        <Grid container spacing={4}>
+          {products.map((product) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+              <ProductCard 
+                product={{
+                  id: product.id,
+                  name: product.product_name,
+                  price: `$${product.price}`,
+                  image: product.img_url,
+                  description: product.description
+                }} 
+              />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+    </Box>
+  );
 
   return (
     <div style={{ paddingTop: '64px', minHeight: '100vh' }}>
@@ -224,177 +247,49 @@ export const Shop = () => {
       {/* Products Sections */}
       <Container sx={{ py: 6 }}>
         {/* Power Section */}
-        <Box ref={sectionRefs.power} sx={{ mb: 10 }}>
-          <Typography 
-            variant="h3" 
-            component="h2" 
-            gutterBottom 
-            sx={{ 
-              fontWeight: 'bold', 
-              color: 'primary.main',
-              mb: 4,
-              borderBottom: '3px solid',
-              borderColor: 'primary.main',
-              pb: 1,
-              display: 'inline-block'
-            }}
-          >
-            Power Accessories
-          </Typography>
-
-          {powerLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : powerError ? (
-            <Typography color="error" sx={{ textAlign: 'center', py: 4 }}>
-              Error loading power products: {powerError}
-            </Typography>
-          ) : (
-            <Grid container spacing={4}>
-              {powerProducts.map((product) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                  <ProductCard 
-                    product={{
-                      id: product.id,
-                      name: product.product_name,
-                      price: `$${product.price}`,
-                      image: product.img_url,
-                      description: product.description
-                    }} 
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          )}
-        </Box>
+        <ProductSection
+          title="Power Accessories"
+          products={powerProducts}
+          loading={powerLoading}
+          error={powerError}
+          sectionRef={sectionRefs.power}
+        />
 
         {/* Sleep & Comfort Section */}
-        <Box ref={sectionRefs.sleep} sx={{ mb: 10 }}>
-          <Typography 
-            variant="h3" 
-            component="h2" 
-            gutterBottom 
-            sx={{ 
-              fontWeight: 'bold', 
-              color: 'primary.main',
-              mb: 4,
-              borderBottom: '3px solid',
-              borderColor: 'primary.main',
-              pb: 1,
-              display: 'inline-block'
-            }}
-          >
-            Sleep & Comfort
-          </Typography>
-          
-          {sleepLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : sleepError ? (
-            <Typography color="error" sx={{ textAlign: 'center', py: 4 }}>
-              Error loading sleep products: {sleepError}
-            </Typography>
-          ) : (
-            <Grid container spacing={4}>
-              {sleepProducts.map((product) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                  <ProductCard 
-                    product={{
-                      id: product.id,
-                      name: product.product_name,
-                      price: `$${product.price}`,
-                      image: product.img_url,
-                      description: product.description
-                    }} 
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          )}
-        </Box>
+        <ProductSection
+          title="Sleep & Comfort"
+          products={sleepProducts}
+          loading={sleepLoading}
+          error={sleepError}
+          sectionRef={sectionRefs.sleep}
+        />
 
         {/* Security Section */}
-        <Box ref={sectionRefs.security} sx={{ mb: 10 }}>
-          <Typography 
-            variant="h3" 
-            component="h2" 
-            gutterBottom 
-            sx={{ 
-              fontWeight: 'bold', 
-              color: 'primary.main',
-              mb: 4,
-              borderBottom: '3px solid',
-              borderColor: 'primary.main',
-              pb: 1,
-              display: 'inline-block'
-            }}
-          >
-            Travel Security
-          </Typography>
-          <Grid container spacing={4}>
-            {staticProducts.security.map((product) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                <ProductCard product={product} />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+        <ProductSection
+          title="Travel Security"
+          products={securityProducts}
+          loading={securityLoading}
+          error={securityError}
+          sectionRef={sectionRefs.security}
+        />
 
         {/* Bags Section */}
-        <Box ref={sectionRefs.bags} sx={{ mb: 10 }}>
-          <Typography 
-            variant="h3" 
-            component="h2" 
-            gutterBottom 
-            sx={{ 
-              fontWeight: 'bold', 
-              color: 'primary.main',
-              mb: 4,
-              borderBottom: '3px solid',
-              borderColor: 'primary.main',
-              pb: 1,
-              display: 'inline-block'
-            }}
-          >
-            Bags & Luggage
-          </Typography>
-          <Grid container spacing={4}>
-            {staticProducts.bags.map((product) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                <ProductCard product={product} />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+        <ProductSection
+          title="Bags & Luggage"
+          products={bagProducts}
+          loading={bagLoading}
+          error={bagError}
+          sectionRef={sectionRefs.bags}
+        />
 
         {/* Rain Protection Section */}
-        <Box ref={sectionRefs.rain} sx={{ mb: 10 }}>
-          <Typography 
-            variant="h3" 
-            component="h2" 
-            gutterBottom 
-            sx={{ 
-              fontWeight: 'bold', 
-              color: 'primary.main',
-              mb: 4,
-              borderBottom: '3px solid',
-              borderColor: 'primary.main',
-              pb: 1,
-              display: 'inline-block'
-            }}
-          >
-            Rain Protection
-          </Typography>
-          <Grid container spacing={4}>
-            {staticProducts.rain.map((product) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
-                <ProductCard product={product} />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+        <ProductSection
+          title="Rain Protection"
+          products={rainProducts}
+          loading={rainLoading}
+          error={rainError}
+          sectionRef={sectionRefs.rain}
+        />
       </Container>
 
       {/* Scroll to top button */}
