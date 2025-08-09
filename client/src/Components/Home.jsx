@@ -34,7 +34,7 @@ export const Home = () => {
   };
 
   const fetchNearbyPlaces = (lat, lng, type) => {
-    const radius = 20000; // 20 km
+    const radius = 5000; // 20 km
     axios
       .get("http://localhost:3001/api/places", {
         params: {
@@ -58,7 +58,11 @@ export const Home = () => {
 
   const handleImageClick = (spot) => {
     setSelectedSpot(spot);
-    fetchNearbyPlaces(spot.latitude, spot.longitude, "hotel"); // Default to hotels
+    // Clear previous travel details and directions
+    setTravelDetails(null);
+    setDirections(null);
+    // Fetch nearby places for the new spot
+    fetchNearbyPlaces(spot.latitude, spot.longitude, "hotel");
     
     // Smooth scroll to map section
     setTimeout(() => {
@@ -72,43 +76,213 @@ export const Home = () => {
     }, 100);
   };
 
-  const handleGetDirections = () => {
-    if (selectedSpot) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          const { latitude, longitude } = position.coords;
-          const userLocation = { lat: latitude, lng: longitude };
+const handleGetDirections = () => {
+  if (selectedSpot) {
+    // Clear previous directions and travel details first
+    setDirections(null);
+    setTravelDetails(null);
 
-          const directionsService = new window.google.maps.DirectionsService();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        const userLocation = { lat: latitude, lng: longitude };
+        const destination = {
+          lat: parseFloat(selectedSpot.latitude),
+          lng: parseFloat(selectedSpot.longitude),
+        };
+
+        // Enhanced travel modes with priorities
+        const travelModes = [
+          {
+            mode: window.google.maps.TravelMode.DRIVING,
+            name: "Driving",
+            allowFerries: true
+          },
+          {
+            mode: window.google.maps.TravelMode.TRANSIT,
+            name: "Public Transit",
+            allowFerries: true
+          },
+          {
+            mode: window.google.maps.TravelMode.WALKING,
+            name: "Walking",
+            allowFerries: true
+          }
+        ];
+
+        const directionsService = new window.google.maps.DirectionsService();
+        const distanceService = new window.google.maps.DistanceMatrixService();
+
+        // Function to calculate straight-line distance
+        const calculateDistance = (lat1, lng1, lat2, lng2) => {
+          const R = 6371; // Earth's radius in km
+          const dLat = (lat2 - lat1) * Math.PI / 180;
+          const dLng = (lng2 - lng1) * Math.PI / 180;
+          const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLng/2) * Math.sin(dLng/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          return R * c;
+        };
+
+        const straightLineDistance = calculateDistance(
+          userLocation.lat, userLocation.lng,
+          destination.lat, destination.lng
+        );
+
+        // Function to provide water crossing alternatives
+        const provideWaterCrossingAlternatives = () => {
+          // Check if it's likely a water crossing based on distance
+          const isLikelyWaterCrossing = straightLineDistance > 50; // Adjust threshold as needed
+          
+          const alternativeInfo = {
+            type: 'water_crossing',
+            straightLineDistance: `${straightLineDistance.toFixed(1)} km`,
+            alternatives: []
+          };
+
+          // Suggest ferry services
+          alternativeInfo.alternatives.push({
+            method: 'Ferry Service',
+            description: 'Look for ferry services that operate between your location and the destination',
+            icon: '⛴️'
+          });
+
+          // Suggest flight options for long distances
+          if (straightLineDistance > 100) {
+            alternativeInfo.alternatives.push({
+              method: 'Flight',
+              description: 'Consider flying to the nearest airport to your destination',
+              icon: '✈️'
+            });
+          }
+
+          // Suggest alternative routes via land
+          alternativeInfo.alternatives.push({
+            method: 'Land Route',
+            description: 'Try finding a route that goes around the water body via bridges or alternative paths',
+            icon: '🌉'
+          });
+
+          // Suggest boat/water taxi
+          alternativeInfo.alternatives.push({
+            method: 'Private Boat/Water Taxi',
+            description: 'Look for private boat services or water taxis in the area',
+            icon: '🚤'
+          });
+
+          return alternativeInfo;
+        };
+
+        // Enhanced function to try different travel modes
+        const tryNextTravelMode = (index) => {
+          if (index >= travelModes.length) {
+            // All travel modes failed, provide water crossing alternatives
+            const alternatives = provideWaterCrossingAlternatives();
+            
+            setTravelDetails({
+              type: 'no_route_found',
+              straightLineDistance: alternatives.straightLineDistance,
+              alternatives: alternatives.alternatives,
+              message: "No direct route found. This might be due to a water body between locations."
+            });
+            
+            return;
+          }
+
+          const currentMode = travelModes[index];
           const request = {
             origin: userLocation,
-            destination: {
-              lat: parseFloat(selectedSpot.latitude),
-              lng: parseFloat(selectedSpot.longitude),
-            },
-            travelMode: window.google.maps.TravelMode.DRIVING,
+            destination: destination,
+            travelMode: currentMode.mode,
+            provideRouteAlternatives: true,
+            avoidFerries: !currentMode.allowFerries,
+            avoidHighways: false,
+            avoidTolls: false,
+            unitSystem: window.google.maps.UnitSystem.METRIC
           };
 
           directionsService.route(request, (result, status) => {
             if (status === "OK") {
+              const route = result.routes[0];
+              const leg = route.legs[0];
+              
+              // Check for ferry warnings or water crossings
+              const hasWaterCrossing = route.warnings?.some(warning => 
+                warning.toLowerCase().includes('ferry') || 
+                warning.toLowerCase().includes('water') ||
+                warning.toLowerCase().includes('bridge')
+              );
+
+              // Check if the route distance is significantly longer than straight-line distance
+              const routeDistanceKm = parseFloat(leg.distance.text.replace(/[^\d.]/g, ''));
+              const distanceRatio = routeDistanceKm / straightLineDistance;
+
               setDirections(result);
-              const leg = result.routes[0].legs[0]; // Extract first leg of the route
               setTravelDetails({
+                type: 'route_found',
                 distance: leg.distance.text,
                 duration: leg.duration.text,
+                travelMode: currentMode.name,
+                straightLineDistance: `${straightLineDistance.toFixed(1)} km`,
+                hasWaterCrossing: hasWaterCrossing,
+                routeComplexity: distanceRatio > 2 ? 'complex' : 'direct',
+                warnings: route.warnings || [],
+                ferryInfo: hasWaterCrossing ? "This route may include water crossings or ferries" : null
               });
+              
+            } else if (status === "ZERO_RESULTS" || status === "NOT_FOUND") {
+              // Try next travel mode
+              tryNextTravelMode(index + 1);
             } else {
-              console.error("Directions request failed due to " + status);
+              console.error(`Directions request failed: ${status}`);
+              tryNextTravelMode(index + 1);
             }
           });
+        };
+
+        // Also try Distance Matrix API for additional information
+        distanceService.getDistanceMatrix({
+          origins: [userLocation],
+          destinations: [destination],
+          travelMode: window.google.maps.TravelMode.DRIVING,
+          avoidHighways: false,
+          avoidTolls: false,
+        }, (response, status) => {
+          if (status === 'OK' && response.rows[0].elements[0].status === 'OK') {
+            // Distance Matrix found a route, proceed with directions
+            tryNextTravelMode(0);
+          } else {
+            // Distance Matrix also failed, likely water crossing
+            const alternatives = provideWaterCrossingAlternatives();
+            setTravelDetails({
+              type: 'no_route_found',
+              straightLineDistance: alternatives.straightLineDistance,
+              alternatives: alternatives.alternatives,
+              message: "No land route available. Consider alternative transportation methods."
+            });
+          }
         });
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
+
+      }, (error) => {
+        console.error("Geolocation error:", error);
+        alert("Unable to get your current location. Please enable location services.");
+      });
     } else {
-      alert("Please select a tourist spot first.");
+      alert("Geolocation is not supported by this browser.");
     }
-  };
+  } else {
+    alert("Please select a tourist spot first.");
+  }
+};
+
+  // Add this useEffect after your other useEffects
+  useEffect(() => {
+    // Clear directions and travel details when selected spot changes
+    setDirections(null);
+    setTravelDetails(null);
+  }, [selectedSpot]);
 
   return (
     <div
@@ -405,30 +579,250 @@ export const Home = () => {
               
               {travelDetails && (
                 <div style={{ 
-                  background: "#f7fafc", 
+                  background: travelDetails.type === 'no_route_found' ? "#fef2f2" : "#f7fafc", 
                   padding: "20px", 
                   borderRadius: "12px",
-                  border: "1px solid #e2e8f0",
+                  border: `1px solid ${travelDetails.type === 'no_route_found' ? "#fecaca" : "#e2e8f0"}`,
                   marginBottom: "20px"
                 }}>
-                  <h4 style={{ 
-                    fontSize: "1.1rem", 
-                    fontWeight: "600", 
-                    color: "#2d3748", 
-                    marginBottom: "10px" 
-                  }}>
-                    Travel Information
-                  </h4>
-                  <div style={{ display: "flex", gap: "20px" }}>
-                    <div>
-                      <span style={{ fontWeight: "600", color: "#4a5568" }}>Distance:</span>
-                      <span style={{ marginLeft: "8px", color: "#667eea" }}>{travelDetails.distance}</span>
-                    </div>
-                    <div>
-                      <span style={{ fontWeight: "600", color: "#4a5568" }}>Duration:</span>
-                      <span style={{ marginLeft: "8px", color: "#667eea" }}>{travelDetails.duration}</span>
-                    </div>
-                  </div>
+                  {travelDetails.type === 'route_found' ? (
+                    <>
+                      <h4 style={{ 
+                        fontSize: "1.1rem", 
+                        fontWeight: "600", 
+                        color: "#2d3748", 
+                        marginBottom: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        flexWrap: "wrap"
+                      }}>
+                        🗺️ Travel Information
+                        {travelDetails.requiresFerry && (
+                          <span style={{
+                            fontSize: "0.75rem",
+                            backgroundColor: "#3182ce",
+                            color: "white",
+                            padding: "2px 8px",
+                            borderRadius: "12px"
+                          }}>
+                            Ferry Required
+                          </span>
+                        )}
+                        {travelDetails.hasBridges && !travelDetails.requiresFerry && (
+                          <span style={{
+                            fontSize: "0.75rem",
+                            backgroundColor: "#48bb78",
+                            color: "white",
+                            padding: "2px 8px",
+                            borderRadius: "12px"
+                          }}>
+                            Bridge Crossing
+                          </span>
+                        )}
+                        {travelDetails.routeComplexity === 'complex' && (
+                          <span style={{
+                            fontSize: "0.75rem",
+                            backgroundColor: "#ed8936",
+                            color: "white",
+                            padding: "2px 8px",
+                            borderRadius: "12px"
+                          }}>
+                            Long Route
+                          </span>
+                        )}
+                      </h4>
+                      
+                      <div style={{ 
+                        display: "grid", 
+                        gridTemplateColumns: "1fr 1fr", 
+                        gap: "15px",
+                        marginBottom: "10px"
+                      }}>
+                        <div>
+                          <span style={{ fontWeight: "600", color: "#4a5568" }}>Distance:</span>
+                          <span style={{ marginLeft: "8px", color: "#667eea" }}>{travelDetails.distance}</span>
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: "600", color: "#4a5568" }}>Duration:</span>
+                          <span style={{ marginLeft: "8px", color: "#667eea" }}>{travelDetails.duration}</span>
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: "600", color: "#4a5568" }}>Mode:</span>
+                          <span style={{ marginLeft: "8px", color: "#667eea" }}>{travelDetails.travelMode}</span>
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: "600", color: "#4a5568" }}>Straight Line:</span>
+                          <span style={{ marginLeft: "8px", color: "#667eea" }}>{travelDetails.straightLineDistance}</span>
+                        </div>
+                      </div>
+
+                      {/* Ferry Information */}
+                      {travelDetails.requiresFerry && (
+                        <div style={{
+                          backgroundColor: "#e6f3ff",
+                          padding: "12px",
+                          borderRadius: "8px",
+                          border: "1px solid #b3d9ff",
+                          marginTop: "10px"
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span>⛴️</span>
+                            <div>
+                              <div style={{ fontWeight: "600", color: "#1a365d", fontSize: "0.9rem" }}>
+                                Ferry Required
+                              </div>
+                              <div style={{ color: "#2c5282", fontSize: "0.85rem", marginTop: "2px" }}>
+                                This route requires taking a ferry. Check ferry schedules and costs before traveling.
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Bridge Information */}
+                      {travelDetails.hasBridges && !travelDetails.requiresFerry && (
+                        <div style={{
+                          backgroundColor: "#f0fff4",
+                          padding: "12px",
+                          borderRadius: "8px",
+                          border: "1px solid #9ae6b4",
+                          marginTop: "10px"
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span>🌉</span>
+                            <div>
+                              <div style={{ fontWeight: "600", color: "#22543d", fontSize: "0.9rem" }}>
+                                Route includes bridge crossings
+                              </div>
+                              <div style={{ color: "#2f855a", fontSize: "0.85rem", marginTop: "2px" }}>
+                                Normal road route with bridge crossings over rivers or waterways.
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Complex Route Warning */}
+                      {travelDetails.routeComplexity === 'complex' && (
+                        <div style={{
+                          backgroundColor: "#fff3cd",
+                          padding: "12px",
+                          borderRadius: "8px",
+                          border: "1px solid #ffeaa7",
+                          marginTop: "10px"
+                        }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span>⚠️</span>
+                            <div>
+                              <div style={{ fontWeight: "600", color: "#856404", fontSize: "0.9rem" }}>
+                                Long detour route (×{travelDetails.distanceRatio} straight-line distance)
+                              </div>
+                              <div style={{ color: "#975a16", fontSize: "0.85rem", marginTop: "2px" }}>
+                                {travelDetails.routeNote || "This route involves significant detours around geographical features"}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Additional Warnings */}
+                      {travelDetails.warnings && travelDetails.warnings.length > 0 && (
+                        <div style={{
+                          backgroundColor: "#f7fafc",
+                          padding: "12px",
+                          borderRadius: "8px",
+                          border: "1px solid #e2e8f0",
+                          marginTop: "10px"
+                        }}>
+                          <div style={{ fontWeight: "600", color: "#2d3748", fontSize: "0.9rem", marginBottom: "5px" }}>
+                            Route Information:
+                          </div>
+                          {travelDetails.warnings.map((warning, index) => (
+                            <div key={index} style={{ 
+                              color: "#4a5568", 
+                              fontSize: "0.85rem", 
+                              marginBottom: "3px",
+                              paddingLeft: "8px"
+                            }}>
+                              • {warning}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <h4 style={{ 
+                        fontSize: "1.1rem", 
+                        fontWeight: "600", 
+                        color: "#dc2626", 
+                        marginBottom: "15px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px"
+                      }}>
+                        🚫 No Road Route Available
+                      </h4>
+                      
+                      <p style={{ color: "#4a5568", marginBottom: "15px" }}>
+                        {travelDetails.message}
+                      </p>
+                      
+                      <div style={{ marginBottom: "15px" }}>
+                        <span style={{ fontWeight: "600", color: "#4a5568" }}>Straight-line distance:</span>
+                        <span style={{ marginLeft: "8px", color: "#667eea" }}>{travelDetails.straightLineDistance}</span>
+                      </div>
+
+                      <div>
+                        <h5 style={{ 
+                          fontWeight: "600", 
+                          color: "#2d3748", 
+                          marginBottom: "10px" 
+                        }}>
+                          Alternative Transportation Options:
+                        </h5>
+                        
+                        {travelDetails.alternatives.map((alternative, index) => (
+                          <div key={index} style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "10px",
+                            padding: "12px",
+                            backgroundColor: "white",
+                            borderRadius: "8px",
+                            border: "1px solid #e2e8f0",
+                            marginBottom: "8px"
+                          }}>
+                            <span style={{ fontSize: "1.2rem" }}>{alternative.icon}</span>
+                            <div>
+                              <div style={{ fontWeight: "600", color: "#2d3748" }}>
+                                {alternative.method}
+                              </div>
+                              <div style={{ fontSize: "0.9rem", color: "#4a5568", marginTop: "2px" }}>
+                                {alternative.description}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{
+                        backgroundColor: "#e6f3ff",
+                        padding: "12px",
+                        borderRadius: "8px",
+                        border: "1px solid #b3d9ff",
+                        marginTop: "15px"
+                      }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <span>💡</span>
+                          <span style={{ color: "#1a365d", fontSize: "0.9rem", fontWeight: "500" }}>
+                            Tip: Contact local travel agencies or tourism offices for the best transportation options to reach this destination.
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
