@@ -1,35 +1,46 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Container, TextField, Button, Typography, Box, Paper } from "@mui/material";
+import { Container, TextField, Button, Typography, Box, Paper, Alert } from "@mui/material";
 
 export const Login = () => {
     // Define state variables for form fields
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
+    const [error, setError] = useState("");
+    
     const navigate = useNavigate();
 
     // Handle form submission
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        axios.post("http://localhost:3001/login", { email, password })
-            .then(result => {
-                if (result.data.message === "Success") {
-                    const user = result.data.user;
-                    // Store the user's _id in localStorage or state
-                    localStorage.setItem("authToken", "user-token-example");
-                    localStorage.setItem("userId", user._id);
-                    console.log(user._id);
-                    navigate("/home");
-                } else {
-                    alert("Login failed. Please check your credentials.");
-                }
-            })
-            .catch(error => {
-                console.error("Error logging in:", error);
-                alert("An error occurred. Please try again.");
-            });
+        setError(""); // Clear any previous errors
+        
+        try {
+            const result = await axios.post("http://localhost:3001/login", { email, password });
+            
+            if (result.data.message === "Success") {
+                const user = result.data.user;
+                // Store the user's _id in localStorage or state
+                localStorage.setItem("authToken", "user-token-example");
+                localStorage.setItem("userId", user._id);
+                console.log(user._id);
+                navigate("/home");
+            } else {
+                setError("Invalid credentials. Please try again.");
+            }
+        } catch (error) {
+            if (error.response) {
+                // The server responded with a status code outside of 2xx
+                setError(error.response.data.message || "Wrong credentials. Please try again.");
+            } else if (error.request) {
+                // The request was made but no response was received
+                setError("Cannot connect to server. Please check your internet connection.");
+            } else {
+                // Something happened in setting up the request
+                setError("An error occurred. Please try again.");
+            }
+        }
     };
 
     return (
@@ -71,6 +82,21 @@ export const Login = () => {
                 >
                     Login
                 </Typography>
+                {error && (
+                    <Alert 
+                        severity="error" 
+                        sx={{ 
+                            mb: 2,
+                            backgroundColor: 'rgba(211, 47, 47, 0.1)', // Semi-transparent red
+                            color: '#fff',
+                            '& .MuiAlert-icon': {
+                                color: '#fff'
+                            }
+                        }}
+                    >
+                        {error}
+                    </Alert>
+                )}
                 <form onSubmit={handleLogin}>
                     <TextField
                         label="Email"
